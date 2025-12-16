@@ -9,6 +9,7 @@ TEMPLATE_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templat
 print(f"[DEBUG] TEMPLATE_DIR: {TEMPLATE_DIR}")
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key')
 
 # --- Flask-Login Setup (moved from app.py) ---
 from flask_login import LoginManager
