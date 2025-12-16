@@ -156,7 +156,7 @@ def init_db():
 @app.route('/')
 def index():
     """Main page shows recipe book for everyone."""
-    return redirect(url_for('recbk'))
+    return render_template('YOUR_TEMPLATE.html')  # Replace with your actual main template, e.g., 'index.html' or 'recipes.html'
 
 
 # ============== Authentication Routes ==============
