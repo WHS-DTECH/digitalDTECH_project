@@ -38,38 +38,8 @@ app = Flask(__name__, template_folder="templates")
 basedir = os.path.abspath(os.path.dirname(__file__))
 DATABASE = os.path.join(basedir, 'recipes.db')
 
+
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key')
-
-# Configure Flask-Login
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-login_manager.anonymous_user = lambda: type('AnonymousUser', (), {'is_authenticated': False})()
-
-# Google OAuth Configuration
-GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:5000/auth/callback')
-
-SCOPES = [
-    'openid',
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile'
-]
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    """Load user from session."""
-    if 'user' in session and session['user'].get('google_id') == user_id:
-        user_data = session['user']
-        return User(
-            user_data['google_id'],
-            user_data['email'],
-            user_data['name'],
-            user_data.get('staff_code')
-        )
-    return None
 
 # Initialize database
 def init_db():
