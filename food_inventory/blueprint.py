@@ -1,5 +1,15 @@
+from flask import Blueprint, render_template
+
+food_inventory_bp = Blueprint(
+    'food_inventory',
+    __name__,
+    template_folder='templates',
+    static_folder='static',
+    url_prefix='/food_inventory'
+)
+
 # Admin route (moved from app.py)
-import csv, io, sqlite3
+import csv, io, sqlite3, os
 from .auth import require_role
 
 @food_inventory_bp.route('/admin', methods=['GET', 'POST'])
