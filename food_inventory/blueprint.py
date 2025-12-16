@@ -1,8 +1,19 @@
-# Recipe Book (recbk) route (moved from app.py)
-from flask import request, render_template
+
+from flask import Blueprint, render_template, request
 import json
 import sqlite3
 from flask_login import current_user
+
+# Define the Blueprint at the top before any route decorators
+food_inventory_bp = Blueprint(
+    'food_inventory',
+    __name__,
+    template_folder='templates',
+    static_folder='static',
+    url_prefix='/food_inventory'
+)
+
+# Recipe Book (recbk) route (moved from app.py)
 
 @food_inventory_bp.route('/recbk')
 def recbk():
@@ -54,15 +65,6 @@ def recbk():
             favorites = []
 
     return render_template('recbk.html', rows=rows, q=q, favorites=favorites)
-from flask import Blueprint, render_template
-
-food_inventory_bp = Blueprint(
-    'food_inventory',
-    __name__,
-    template_folder='templates',
-    static_folder='static',
-    url_prefix='/food_inventory'
-)
 
 # Admin route (moved from app.py)
 import csv, io, sqlite3, os
