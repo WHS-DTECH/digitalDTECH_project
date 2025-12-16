@@ -149,9 +149,11 @@ def inject_user():
 
 
 # Root route for food_inventory blueprint
+from flask import redirect, url_for
+
 @food_inventory_bp.route('/')
 def index():
-    return render_template('recbk.html')
+    return redirect(url_for('food_inventory.recbk'))
 
 
 # Login route for food_inventory blueprint
