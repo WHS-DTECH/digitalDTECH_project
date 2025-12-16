@@ -165,7 +165,7 @@
       <a href="{{ url_for('food_inventory.index') }}" class="nav-brand">🍳 Food Room</a> |
       <a href="{{ url_for('food_inventory.index') }}">Recipe Book</a>
       {% if current_user.is_authenticated %}
-        | <a href="{{ url_for('food_inventory.recipes_page') }}">Recipes</a>
+        | <a href="{{ url_for('food_inventory.index') }}">Recipes</a>
         | <a href="{{ url_for('food_inventory.class_ingredients') }}">Class Ingredients</a>
         | <a href="{{ url_for('food_inventory.booking_calendar') }}">Booking Calendar</a>
         | <a href="{{ url_for('food_inventory.shoplist') }}">Shopping List</a>
