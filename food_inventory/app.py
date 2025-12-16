@@ -31,7 +31,8 @@ load_dotenv()
 if os.getenv('FLASK_ENV') == 'development':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
+
 # Database path
 basedir = os.path.abspath(os.path.dirname(__file__))
 DATABASE = os.path.join(basedir, 'recipes.db')
