@@ -1,3 +1,59 @@
+# Recipe Book (recbk) route (moved from app.py)
+from flask import request, render_template
+import json
+import sqlite3
+from flask_login import current_user
+
+@food_inventory_bp.route('/recbk')
+def recbk():
+    db_path = os.path.join(os.path.dirname(__file__), 'recipes.db')
+    q = request.args.get('q', '').strip()
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        if q:
+            term = f"%{q}%"
+            c.execute(
+                "SELECT id, name, ingredients, instructions, serving_size, equipment, dietary_tags, cuisine, difficulty FROM recipes "
+                "WHERE name LIKE ? OR ingredients LIKE ? "
+                "ORDER BY name COLLATE NOCASE",
+                (term, term),
+            )
+        else:
+            c.execute(
+                "SELECT id, name, ingredients, instructions, serving_size, equipment, dietary_tags, cuisine, difficulty FROM recipes "
+                "ORDER BY name COLLATE NOCASE"
+            )
+        rows = [dict(r) for r in c.fetchall()]
+
+    # Decode JSON fields for template
+    for r in rows:
+        try:
+            r['ingredients'] = json.loads(r.get('ingredients') or '[]')
+        except Exception:
+            r['ingredients'] = []
+        try:
+            r['equipment'] = json.loads(r.get('equipment') or '[]')
+        except Exception:
+            r['equipment'] = []
+        try:
+            r['dietary_tags_list'] = json.loads(r.get('dietary_tags') or '[]')
+        except Exception:
+            r['dietary_tags_list'] = []
+
+    # Get user's favorites if logged in
+    favorites = []
+    if current_user.is_authenticated:
+        try:
+            with sqlite3.connect(db_path) as conn:
+                c = conn.cursor()
+                c.execute('SELECT recipe_id FROM recipe_favorites WHERE user_email = ?', (current_user.email,))
+                favorites = [row[0] for row in c.fetchall()]
+        except sqlite3.OperationalError:
+            # Table doesn't exist yet - run setup_database.py to create it
+            favorites = []
+
+    return render_template('recbk.html', rows=rows, q=q, favorites=favorites)
 from flask import Blueprint, render_template
 
 food_inventory_bp = Blueprint(
