@@ -162,21 +162,21 @@
 <body>
   <nav class="navbar">
     <div class="nav-left">
-      <a href="/" class="nav-brand">🍳 Food Room</a> |
-      <a href="/recbk">Recipe Book</a>
+      <a href="{{ url_for('food_inventory.index') }}" class="nav-brand">🍳 Food Room</a> |
+      <a href="{{ url_for('food_inventory.index') }}">Recipe Book</a>
       {% if current_user.is_authenticated %}
-        | <a href="/recipes">Recipes</a>
-        | <a href="/class_ingredients">Class Ingredients</a>
-        | <a href="/booking">Booking Calendar</a>
-        | <a href="/shoplist">Shopping List</a>
+        | <a href="{{ url_for('food_inventory.recipes_page') }}">Recipes</a>
+        | <a href="{{ url_for('food_inventory.class_ingredients') }}">Class Ingredients</a>
+        | <a href="{{ url_for('food_inventory.booking_calendar') }}">Booking Calendar</a>
+        | <a href="{{ url_for('food_inventory.shoplist') }}">Shopping List</a>
         {% if current_user.is_admin() %}
-          | <a href="/admin">Admin</a>
+          | <a href="{{ url_for('food_inventory.admin') }}">Admin</a>
         {% endif %}
       {% endif %}
     </div>
     <div class="nav-right">
       {% if current_user.is_authenticated %}
-        <span class="user-info">{{ current_user.name }}<span class="badge badge-{{ current_user.role }}">{{ current_user.role }}</span></span> | <a href="/logout" class="logout-link">Logout</a>
+        <span class="user-info">{{ current_user.name }}<span class="badge badge-{{ current_user.role }}">{{ current_user.role }}</span></span> | <a href="{{ url_for('food_inventory.logout') }}" class="logout-link">Logout</a>
       {% else %}
         <a href="{{ url_for('food_inventory.login') }}" class="login-link">Login</a>
       {% endif %}
