@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Recipe</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <nav>
+    <a href="/">Dashboard</a> |
+    <a href="/recipes">Recipes</a> |
+    <a href="/recbk">Recipe Book</a> |
+    <a href="/class_ingredients">Class Ingredients</a> |
+    <a href="/booking">Booking Calendar</a> |
+    <a href="/shoplist">Shopping List</a> |
+    <a href="/admin">Admin</a>
+  </nav>
+  <h1>Edit Recipe</h1>
+  <form method="post">
+    <label>Name</label>
+    <input type="text" name="name" value="{{ recipe.name }}" required />
+
+    <label>Serving Size</label>
+    <input type="text" name="serving_size" value="{{ recipe.serving_size or '' }}" />
+
+    <label>Dietary Tags (comma-separated: e.g., Vegetarian, Gluten-Free, Dairy-Free)</label>
+    <input type="text" name="dietary_tags" value="{{ recipe.dietary_tags or '' }}" placeholder="e.g., Vegetarian, Gluten-Free" />
+
+    <label>Cuisine</label>
+    <input type="text" name="cuisine" value="{{ recipe.cuisine or '' }}" placeholder="e.g., Italian, Asian, Mexican" />
+
+    <label>Difficulty</label>
+    <select name="difficulty">
+      <option value="">Select difficulty...</option>
+      <option value="Easy" {% if recipe.difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+      <option value="Medium" {% if recipe.difficulty == 'Medium' %}selected{% endif %}>Medium</option>
+      <option value="Hard" {% if recipe.difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+    </select>
+
+    <label>Instructions</label>
+    <textarea name="instructions">{{ recipe.instructions }}</textarea>
+
+    <label>Ingredients</label>
+    <div id="ingredients-list">
+      {% if ingredients_text %}
+        {% for line in ingredients_text.splitlines() %}
+          <div class="ing-row">
+            <input type="text" name="ingredient_line" value="{{ line }}" style="width:90%" />
+            <button type="button" class="remove-ing">—</button>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="ing-row">
+          <input type="text" name="ingredient_line" value="" style="width:90%" />
+          <button type="button" class="remove-ing">—</button>
+        </div>
+      {% endif %}
+    </div>
+    <button type="button" id="add-ingredient">Add ingredient</button>
+
+    <label>Equipment (one per input)</label>
+    <div id="equipment-list">
+      {% if equipment_text %}
+        {% for line in equipment_text.splitlines() %}
+          <div class="eq-row">
+            <input type="text" name="equipment_item" value="{{ line }}" style="width:90%" />
+            <button type="button" class="remove-eq">—</button>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="eq-row">
+          <input type="text" name="equipment_item" value="" style="width:90%" />
+          <button type="button" class="remove-eq">—</button>
+        </div>
+      {% endif %}
+    </div>
+    <button type="button" id="add-equipment">Add equipment</button>
+
+    <button type="submit">Save</button>
+  </form>
+  <p><a href="/recipe/{{ recipe.id }}">Back to recipe</a></p>
+  <script>
+    function addRow(containerId, inputName, removeClass){
+      const container = document.getElementById(containerId);
+      const div = document.createElement('div');
+      div.className = removeClass === 'remove-ing' ? 'ing-row' : 'eq-row';
+      div.innerHTML = `<input type="text" name="${inputName}" style="width:90%" /> <button type="button" class="${removeClass}">—</button>`;
+      container.appendChild(div);
+    }
+    document.getElementById('add-ingredient').addEventListener('click', function(){ addRow('ingredients-list','ingredient_line','remove-ing'); });
+    document.getElementById('add-equipment').addEventListener('click', function(){ addRow('equipment-list','equipment_item','remove-eq'); });
+    document.addEventListener('click', function(e){
+      if(e.target && e.target.classList.contains('remove-ing')){
+        e.target.parentNode.remove();
+      }
+      if(e.target && e.target.classList.contains('remove-eq')){
+        e.target.parentNode.remove();
+      }
+    });
+    // ensure form submits ingredient lines as ingredient_line[] and equipment_item[]
+    document.querySelector('form').addEventListener('submit', function(){
+      // convert all inputs named 'ingredient_line' to array fields
+      document.querySelectorAll('input[name="ingredient_line"]').forEach(function(inp){ inp.name = 'ingredient_line[]'; });
+      document.querySelectorAll('input[name="equipment_item"]').forEach(function(inp){ inp.name = 'equipment_item[]'; });
+    });
+  </script>
+</body>
+</html>

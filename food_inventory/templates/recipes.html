@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">🍳 Food Room</a> |
+      <a href="/recbk">Recipe Book</a> |
+      <a href="/recipes">Recipes</a>
+      {% if current_user.is_authenticated %}
+        | <a href="/class_ingredients">Class Ingredients</a>
+        | <a href="/booking">Booking Calendar</a>
+        | <a href="/shoplist">Shopping List</a>
+        {% if current_user.is_admin() %}
+          | <a href="/admin">Admin</a>
+        {% endif %}
+      {% endif %}
+    </div>
+    <div class="nav-right">
+      {% if current_user.is_authenticated %}
+        <span class="user-info">{{ current_user.name }}<span class="badge badge-{{ current_user.role }}">{{ current_user.role }}</span></span> | <a href="/logout" class="logout-link">Logout</a>
+      {% else %}
+        <a href="/login" class="login-link">Login</a>
+      {% endif %}
+    </div>
+  </nav>
+  
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div style="margin:10px 0;padding:12px;background:#d4edda;border:1px solid #c3e6cb;color:#155724;border-radius:4px;max-width:720px;">
+        {% for message in messages %}
+          <div>{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  
+  <h1>Recipes</h1>
+  
+  <!-- Two-column layout: Search/Filter on left, Suggestion box on right -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:12px 0;">
+    
+    <!-- Left: Advanced Search & Filter -->
+    <div style="padding:16px; border:1px solid #ddd; background:#f9f9f9; border-radius:6px;">
+      <h3 style="margin-top:0;">🔍 Search & Filter</h3>
+      <form method="get" action="/recipes" style="display:grid; gap:12px;">
+        <!-- Text Search -->
+        <div>
+          <label style="display:block; margin-bottom:4px; font-weight:bold;">Search by name, ingredient, or instructions:</label>
+          <input type="search" name="q" placeholder="e.g., chocolate, pasta, baking..." value="{{ q }}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+        </div>
+        
+        <!-- Filters Row -->
+        <div style="display:grid; grid-template-columns:1fr; gap:12px;">
+          <!-- Dietary Tags -->
+          <div>
+            <label style="display:block; margin-bottom:4px; font-weight:bold;">Dietary:</label>
+            <select name="dietary" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+              <option value="">All</option>
+              {% for tag in all_dietary_tags %}
+                <option value="{{ tag }}" {% if dietary == tag %}selected{% endif %}>{{ tag }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Cuisine -->
+          <div>
+            <label style="display:block; margin-bottom:4px; font-weight:bold;">Cuisine:</label>
+            <select name="cuisine" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+              <option value="">All</option>
+              {% for c in all_cuisines %}
+                <option value="{{ c }}" {% if cuisine == c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Difficulty -->
+          <div>
+            <label style="display:block; margin-bottom:4px; font-weight:bold;">Difficulty:</label>
+            <select name="difficulty" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+              <option value="">All</option>
+              <option value="Easy" {% if difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+              <option value="Medium" {% if difficulty == 'Medium' %}selected{% endif %}>Medium</option>
+              <option value="Hard" {% if difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div>
+          <button type="submit" style="padding:8px 20px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer; font-size:14px;">Apply Filters</button>
+          {% if q or dietary or cuisine or difficulty %}
+            <a href="/recipes" style="margin-left:10px; padding:8px 20px; background:#6c757d; color:white; text-decoration:none; border-radius:4px; display:inline-block;">Clear All</a>
+          {% endif %}
+          <div style="margin-top:10px; color:#666;">{{ rows|length }} recipe(s) found</div>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Right: Recipe Suggestion Box -->
+    <div style="padding:20px; border:2px solid #007bff; background:#f0f8ff; border-radius:8px;">
+      <h3 style="margin-top:0; color:#007bff;">💡 Suggest a Recipe</h3>
+      <p style="color:#666; margin-bottom:15px;">Have a recipe you'd like added to our collection? Share your suggestion with the VP!</p>
+      <form id="suggestionForm" method="post" action="/recipes/suggest">
+        <div style="margin-bottom:12px;">
+          <label style="display:block; margin-bottom:4px; font-weight:bold;">Recipe Name:</label>
+          <input type="text" name="recipe_name" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" placeholder="e.g., Chocolate Chip Cookies">
+        </div>
+        
+        <div style="margin-bottom:12px;">
+          <label style="display:block; margin-bottom:4px; font-weight:bold;">Recipe URL (optional):</label>
+          <input type="url" name="recipe_url" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" placeholder="https://...">
+        </div>
+        
+        <div style="margin-bottom:12px;">
+          <label style="display:block; margin-bottom:4px; font-weight:bold;">Why should we add this recipe?</label>
+          <textarea name="reason" rows="3" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" placeholder="Tell us why this recipe would be great for our students..."></textarea>
+        </div>
+        
+        <button type="submit" style="padding:10px 24px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer; font-size:14px; font-weight:bold;">📧 Send Suggestion</button>
+      </form>
+    </div>
+    
+  </div>
+
+  {% if rows %}
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Tags</th>
+        <th>Cuisine</th>
+        <th>Difficulty</th>
+        <th>Ingredients</th>
+        <th>Equipment</th>
+        <th>Serving Size</th>
+        <th>Method</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><a href="/recipe/{{ r.id }}">{{ r.name }}</a></td>
+        <td>
+          {% if r.dietary_tags_list %}
+            {% for tag in r.dietary_tags_list %}
+              <span class="diet-tag">{{ tag }}</span>
+            {% endfor %}
+          {% else %}
+            <span style="color:#999;">—</span>
+          {% endif %}
+        </td>
+        <td>{{ r.cuisine or '—' }}</td>
+        <td>
+          {% if r.difficulty == 'Easy' %}
+            <span style="color:#28a745;">● Easy</span>
+          {% elif r.difficulty == 'Medium' %}
+            <span style="color:#ffc107;">● Medium</span>
+          {% elif r.difficulty == 'Hard' %}
+            <span style="color:#dc3545;">● Hard</span>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>
+          {% if r.ingredients %}
+            <ul>
+              {% for ing in r.ingredients %}
+                <li>
+                  {% if ing.quantity or ing.unit %}
+                    {{ ing.quantity }} {{ ing.unit }}
+                  {% endif %}
+                  {{ ing.ingredient }}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>
+          {% if r.equipment %}
+            {{ r.equipment | join(', ') }}
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>{{ r.serving_size or '—' }}</td>
+        <td>
+          {% if r.instructions %}
+            <details>
+              <summary>View method</summary>
+              <pre style="white-space: pre-wrap">{{ r.instructions }}</pre>
+            </details>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p>No recipes found.</p>
+  {% endif %}
+
+</body>
+</html>

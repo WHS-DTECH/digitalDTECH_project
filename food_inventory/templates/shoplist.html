@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Shopping List</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <nav class="navbar no-print">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">🍳 Food Room</a> |
+      <a href="/recipes">Recipes</a> |
+      <a href="/recbk">Recipe Book</a> |
+      <a href="/class_ingredients">Class Ingredients</a> |
+      <a href="/booking">Booking Calendar</a> |
+      <a href="/shoplist">Shopping List</a>
+      {% if current_user.is_admin() %}
+        | <a href="/admin">Admin</a>
+      {% endif %}
+    </div>
+    <div class="nav-right">
+      {% if current_user.is_authenticated %}
+        <span class="user-info">{{ current_user.name }}<span class="badge badge-{{ current_user.role }}">{{ current_user.role }}</span></span> | <a href="/logout" class="logout-link">Logout</a>
+      {% else %}
+        <a href="/login" class="login-link">Login</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <div class="week-nav no-print">
+    <span class="label">{{ week_label }}</span>
+    <a href="/shoplist?week={{ prev_week }}">Previous Week</a>
+    {% if week_offset != 0 %}
+    <a href="/shoplist?week=0" style="font-weight: bold;">Current Week</a>
+    {% endif %}
+    <a href="/shoplist?week={{ next_week }}">Next Week</a>
+  </div>
+
+  <h1 class="no-print">Weekly Booking Grid</h1>
+  <table class="grid no-print">
+    <thead>
+      <tr>
+        <th>Period</th>
+        {% for d in dates %}
+          <th>{{ d.day_name }}<br><span class="small-muted">{{ d.nz_date }}</span></th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for period in range(1,6) %}
+        <tr>
+          <td><span class="period">P{{ period }}</span></td>
+          {% for d in dates %}
+            {% set key = d.date + '_P' + period|string %}
+            {% set booking = grid.get(key) %}
+            <td>
+              {% if booking %}
+                <div class="booking" data-booking-id="{{ booking.id }}">
+                  <div class="booking-title">{{ booking.recipe_name or '—' }}</div>
+                  <div class="booking-meta">Class: {{ booking.class_code or '—' }}</div>
+                  <div class="booking-meta">Teacher: {{ booking.last_name or booking.staff_code or '—' }}{% if booking.first_name %}, {{ booking.first_name }}{% endif %}</div>
+                  <div class="booking-meta">Servings: {{ booking.desired_servings or '—' }}</div>
+                  <div class="booking-meta">{{ d.nz_date }}</div>
+                  <div class="booking-meta">Tap to select</div>
+                </div>
+              {% else %}
+                <div class="empty">—</div>
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="bottom-layout">
+    <div class="panel no-print">
+      <h3>Selected Bookings</h3>
+      <div class="actions" style="margin-bottom: 12px;">
+        <button class="primary" onclick="autoGenerateWeek()" style="background: #28a745;">🚀 Auto-Generate Week</button>
+        <button onclick="selectAllWeek()">Select Entire Week</button>
+        <button onclick="clearAllSelections()">Clear Selection</button>
+        <button class="primary" onclick="generateShoppingList()">Generate Shopping List</button>
+      </div>
+      <ul class="selected-list" id="selectedList"></ul>
+      <div class="notice" id="selectionNotice">No bookings selected. Tap cells above or use "Auto-Generate Week".</div>
+    </div>
+
+    <div class="shopping-list" id="shoppingList">
+      <div class="actions no-print" style="margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button onclick="saveShoppingList()">💾 Save List</button>
+        <button onclick="loadShoppingList()">📂 Load Saved</button>
+        <button onclick="exportShoppingListCsv()">📄 Export CSV</button>
+        <button class="primary" onclick="window.print()">🖨️ Print</button>
+      </div>
+      <h2>Shopping List</h2>
+      <div class="week-label">{{ week_label }}</div>
+      <div id="listContent" class="small-muted">Click "Auto-Generate Week" to instantly create a shopping list for all bookings this week.</div>
+    </div>
+  </div>
+
+  <div class="preview-banner no-print" style="margin-top: 12px;">Buttons and grid will not appear when printing; only the shopping list is printed.</div>
+
+  <script>
+    const bookings = {{ bookings|tojson }};
+    const recipes = {{ recipes|tojson }};
+    const dates = {{ dates|tojson }};
+    const weekLabel = {{ week_label|tojson }};
+
+    const selection = new Set();
+    const alreadyHaveItems = new Set();
+    const weekStart = '{{ dates[0].date }}';
+    
+    const unitAliases = {
+      g: 'g', gram: 'g', grams: 'g', kg: 'kg', kilogram: 'kg', kilograms: 'kg',
+      ml: 'ml', millilitre: 'ml', milliliter: 'ml', milliliters: 'ml', millilitres: 'ml',
+      l: 'l', litre: 'l', liters: 'l', litres: 'l',
+      t: 'tsp', tsp: 'tsp', teaspoon: 'tsp', teaspoons: 'tsp',
+      tbsp: 'tbsp', tablespoon: 'tbsp', tablespoons: 'tbsp', tbs: 'tbsp',
+      cup: 'cup', cups: 'cup', c: 'cup'
+    };
+
+    const produceUnitless = ['apple','banana','orange','onion','carrot','potato','pepper','capsicum','egg'];
+    
+    // Helper to categorize ingredients by store section
+    function categorizeIngredient(name) {
+      const nameLower = name.toLowerCase();
+      
+      const produce = ['apple', 'banana', 'orange', 'lemon', 'lime', 'tomato', 'potato', 'onion', 'garlic', 
+                       'carrot', 'lettuce', 'spinach', 'cabbage', 'broccoli', 'cauliflower', 'pepper', 'capsicum',
+                       'cucumber', 'zucchini', 'mushroom', 'avocado', 'celery', 'ginger', 'herb', 'parsley',
+                       'cilantro', 'basil', 'mint', 'thyme', 'rosemary', 'kale', 'chard', 'beetroot', 'pumpkin'];
+      
+      const dairy = ['milk', 'cream', 'butter', 'cheese', 'yogurt', 'yoghurt', 'sour cream', 'feta', 'mozzarella',
+                     'parmesan', 'cheddar', 'brie', 'cottage cheese', 'ricotta', 'halloumi'];
+      
+      const meat = ['chicken', 'beef', 'pork', 'lamb', 'turkey', 'bacon', 'sausage', 'mince', 'steak',
+                    'fish', 'salmon', 'tuna', 'prawn', 'shrimp', 'mussel', 'seafood'];
+      
+      const pantry = ['flour', 'sugar', 'rice', 'pasta', 'bread', 'cereal', 'oats', 'quinoa', 'couscous',
+                      'lentil', 'bean', 'chickpea', 'oil', 'vinegar', 'sauce', 'stock', 'broth',
+                      'honey', 'jam', 'peanut butter', 'nuts', 'almond', 'cashew', 'seed', 'spice',
+                      'salt', 'pepper', 'cumin', 'paprika', 'cinnamon', 'vanilla', 'cocoa', 'chocolate',
+                      'baking powder', 'baking soda', 'yeast', 'cornstarch', 'cornflour'];
+      
+      const frozen = ['frozen', 'ice cream', 'peas', 'corn', 'berries'];
+      const beverages = ['juice', 'soda', 'water', 'tea', 'coffee', 'wine', 'beer'];
+      
+      if (produce.some(item => nameLower.includes(item))) return 'Produce';
+      if (dairy.some(item => nameLower.includes(item))) return 'Dairy';
+      if (meat.some(item => nameLower.includes(item))) return 'Meat & Seafood';
+      if (pantry.some(item => nameLower.includes(item))) return 'Pantry';
+      if (frozen.some(item => nameLower.includes(item))) return 'Frozen';
+      if (beverages.some(item => nameLower.includes(item))) return 'Beverages';
+      
+      return 'Other';
+    }
+
+    const validUnits = ['g', 'kg', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'pcs', 'oz', 'lb', 'pt', 'qt', 'gal'];
+
+    function normalizeUnit(unit) {
+      if (!unit) return '';
+      const key = unit.toString().trim().toLowerCase();
+      const normalized = unitAliases[key] || key;
+      // Only return the unit if it's in our valid units list
+      return validUnits.includes(normalized) ? normalized : '';
+    }
+
+    function parseFraction(str) {
+      if (!str) return 0;
+      str = String(str).trim();
+      
+      // Unicode fractions
+      const fractionMap = {
+        '½': 0.5, '⅓': 0.333, '⅔': 0.667, '¼': 0.25, '¾': 0.75,
+        '⅕': 0.2, '⅖': 0.4, '⅗': 0.6, '⅘': 0.8, '⅙': 0.167,
+        '⅚': 0.833, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
+      };
+      
+      if (fractionMap[str]) return fractionMap[str];
+      
+      // Handle "1/2" style fractions
+      const fracMatch = str.match(/^(\d+)\/(\d+)$/);
+      if (fracMatch) {
+        return parseFloat(fracMatch[1]) / parseFloat(fracMatch[2]);
+      }
+      
+      // Handle mixed numbers like "2 1/2", "24 2/3" or "2½"
+      const mixedMatch = str.match(/^(\d+)\s+([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|\d+\/\d+)$/);
+      if (mixedMatch) {
+        const whole = parseFloat(mixedMatch[1]);
+        const frac = parseFraction(mixedMatch[2]);
+        return whole + frac;
+      }
+      
+      return 0;
+    }
+
+    function parseNumber(val) {
+      if (val === null || val === undefined || val === '') return null;
+      
+      const str = String(val).trim();
+      
+      // Try fraction parsing first
+      const fracResult = parseFraction(str);
+      if (fracResult > 0) return fracResult;
+      
+      // Handle numbers with Unicode fractions attached (no space): "24½" 
+      const unicodeFracMatch = str.match(/^(\d+(?:\.\d+)?)([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])$/);
+      if (unicodeFracMatch) {
+        const whole = parseFloat(unicodeFracMatch[1]);
+        const frac = parseFraction(unicodeFracMatch[2]);
+        return whole + frac;
+      }
+      
+      // Handle "24 ½" or "24 2/3" with space
+      const spacedFracMatch = str.match(/^(\d+(?:\.\d+)?)\s+([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|\d+\/\d+)$/);
+      if (spacedFracMatch) {
+        const whole = parseFloat(spacedFracMatch[1]);
+        const frac = parseFraction(spacedFracMatch[2]);
+        return whole + frac;
+      }
+      
+      const num = parseFloat(str.replace(',', '.'));
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function collapseDuplicateWords(str) {
+      if (!str) return '';
+      return str.replace(/\b(\w+)(\s+\1)+\b/gi, '$1');
+    }
+
+    function normalizeName(name) {
+      if (!name) return '';
+      let clean = name.toLowerCase().trim();
+      clean = clean.replace(/\([^)]*\)/g, ''); // Remove parentheses
+      clean = clean.replace(/\s+/g, ' '); // Collapse spaces
+      clean = collapseDuplicateWords(clean);
+      
+      // Only apply pluralization normalization for exact matches to prevent incorrect merging
+      const exactAliases = {
+        'capsicums': 'capsicum',
+        'peppers': 'pepper', 
+        'tomatoes': 'tomato',
+        'potatoes': 'potato',
+        'onions': 'onion',
+        'eggs': 'egg',
+        'bananas': 'banana',
+        'apples': 'apple'
+      };
+      
+      // Only replace if the ENTIRE clean string matches
+      if (exactAliases[clean]) {
+        clean = exactAliases[clean];
+      }
+      
+      return clean;
+    }
+
+    function formatQtyUnit(totalQty, unit) {
+      if (totalQty === null || totalQty === undefined) return '';
+      const u = normalizeUnit(unit);
+      let qty = totalQty;
+      
+      // Convert large amounts to bigger units
+      if (u === 'g' && qty >= 1000) {
+        const kg = qty / 1000;
+        return `${kg.toFixed(kg >= 10 ? 0 : kg >= 1 ? 1 : 2).replace(/\.0+$/, '')} kg`;
+      }
+      if (u === 'ml' && qty >= 1000) {
+        const liters = qty / 1000;
+        return `${liters.toFixed(liters >= 10 ? 0 : liters >= 1 ? 1 : 2).replace(/\.0+$/, '')} L`;
+      }
+      
+      // Round whole numbers, show decimals for fractions
+      if (qty === Math.floor(qty)) {
+        return u ? `${qty} ${u}` : `${qty}`;
+      }
+      
+      // Show up to 2 decimal places for fractional amounts
+      const formatted = qty.toFixed(2).replace(/\.?0+$/, '');
+      return u ? `${formatted} ${u}` : formatted;
+    }
+
+    function applyUnitlessHeuristic(name, unit) {
+      if (unit) return unit;
+      const base = normalizeName(name);
+      if (produceUnitless.includes(base)) return 'pcs';
+      // Common liquid/weight items that should have units
+      const liquids = ['milk', 'water', 'oil', 'cream', 'juice'];
+      const weighted = ['flour', 'sugar', 'butter', 'margarine', 'cheese', 'nuts', 'sultanas', 'carrots', 'oats'];
+      if (liquids.includes(base)) return 'ml';
+      if (weighted.includes(base)) return 'g';
+      return '';
+    }
+
+    function convertToBase(qty, unit, ingredientName = '') {
+      const u = normalizeUnit(unit);
+      const nameLower = ingredientName.toLowerCase();
+      
+      // Check if this is a dry good that was incorrectly measured in volume
+      const dryGoods = ['flour', 'sugar', 'oats', 'rice', 'salt', 'baking powder', 'baking soda',
+                        'chocolate chips', 'chocolate', 'chips', 'wholemeal', 'white sugar', 'brown sugar'];
+      const isDryGood = dryGoods.some(item => nameLower.includes(item));
+      
+      console.log(`convertToBase: qty=${qty}, unit=${unit}, name="${ingredientName}", isDryGood=${isDryGood}, normalized unit=${u}`);
+      
+      // Convert units to base units
+      if (u === 'kg') return { qty: qty * 1000, unit: 'g' };
+      if (u === 'g') return { qty, unit: 'g' };
+      
+      // For cups/teaspoons/tablespoons, convert dry goods to grams, liquids to ml
+      if (u === 'cup') {
+        if (isDryGood) {
+          // 1 cup flour ≈ 125g, 1 cup sugar ≈ 200g, average ~150g for dry goods
+          console.log(`  Converting ${qty} cup ${ingredientName} to ${qty * 150}g (dry good)`);
+          return { qty: qty * 150, unit: 'g' };
+        }
+        return { qty: qty * 250, unit: 'ml' }; // Liquids: 1 cup = 250ml
+      }
+      
+      if (u === 'tsp') {
+        if (isDryGood) {
+          // 1 tsp dry goods ≈ 5g
+          console.log(`  Converting ${qty} tsp ${ingredientName} to ${qty * 5}g (dry good)`);
+          return { qty: qty * 5, unit: 'g' };
+        }
+        return { qty: qty * 5, unit: 'ml' }; // Liquids: 1 tsp = 5ml
+      }
+      
+      if (u === 'tbsp') {
+        if (isDryGood) {
+          // 1 tbsp dry goods ≈ 15g
+          console.log(`  Converting ${qty} tbsp ${ingredientName} to ${qty * 15}g (dry good)`);
+          return { qty: qty * 15, unit: 'g' };
+        }
+        return { qty: qty * 15, unit: 'ml' }; // Liquids: 1 tbsp = 15ml
+      }
+      
+      // For liters/ml, check if it's a dry good first
+      if (u === 'l') {
+        if (isDryGood) {
+          console.log(`  Converting ${qty}L ${ingredientName} to ${qty * 1000}g (dry good)`);
+          return { qty: qty * 1000, unit: 'g' }; // Convert L to g for dry goods (1L ≈ 1kg)
+        }
+        return { qty: qty * 1000, unit: 'ml' }; // Convert L to ml for liquids
+      }
+      if (u === 'ml') {
+        if (isDryGood) {
+          console.log(`  Converting ${qty}ml ${ingredientName} to ${qty}g (dry good)`);
+          return { qty, unit: 'g' }; // Convert ml to g for dry goods (1ml ≈ 1g)
+        }
+        return { qty, unit: 'ml' }; // Keep ml for liquids
+      }
+      
+      // Default: return as-is
+      // But if there's no unit and it's a dry good with a quantity, infer grams
+      if (!u && qty && isDryGood && qty >= 10) {
+        console.log(`  No unit for ${qty} ${ingredientName}, inferring grams (dry good)`);
+        return { qty, unit: 'g' };
+      }
+      
+      return { qty, unit: u };
+    }
+
+    function parseIngredient(raw) {
+      let result = { qty: null, unit: '', name: '' };
+      
+      // The PDF parser stored data in wrong fields. Common patterns:
+      // 1. Everything in ingredient: "½ cup Wholemeal flour" with empty qty/unit
+      // 2. Ingredient has "t baking powder", unit has "¼", qty has "1.0"
+      // 3. Ingredient has "Cup sugar", unit has "1/2", qty has "1.0"
+      // 4. Ingredient has "or margarine", unit has "butter"
+      
+      let fullText = (raw.ingredient || '').trim();
+      
+      // If ingredient field contains fraction/number + unit + name pattern, parse from there
+      // Match patterns like: "½ cup Wholemeal flour", "2/3 Cup sugar", "1/2 t baking powder"
+      const fullMatch = fullText.match(/^([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|\d+\/\d+|\d+\s+\d+\/\d+|\d+(?:\.\d+)?)\s*([a-zA-Z]+)\s+(.+)$/i);
+      
+      if (fullMatch) {
+        // Pattern matched: extract qty, unit, name from ingredient field
+        result.qty = parseFraction(fullMatch[1]) || parseNumber(fullMatch[1]);
+        result.unit = normalizeUnit(fullMatch[2]);
+        result.name = fullMatch[3].trim();
+      } else if (fullText.match(/^([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|\d+\/\d+)\s+(.+)$/)) {
+        // Just fraction + name (no unit word): "½ Wholemeal flour"
+        const fracMatch = fullText.match(/^([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|\d+\/\d+)\s+(.+)$/);
+        result.qty = parseFraction(fracMatch[1]);
+        result.name = fracMatch[2].trim();
+      } else {
+        // Use the database fields as-is
+        result.qty = parseNumber(raw.quantity);
+        result.unit = normalizeUnit(raw.unit);
+        result.name = fullText;
+        
+        // But if unit field contains a fraction, it's probably misplaced
+        if (raw.unit && (raw.unit.match(/[½⅓⅔¼¾]/) || raw.unit.match(/^\d+\/\d+$/))) {
+          const fracQty = parseFraction(raw.unit);
+          if (fracQty > 0) {
+            // Multiply qty by the fraction in unit field
+            result.qty = (result.qty || 1) * fracQty;
+            result.unit = ''; // Clear the bogus unit
+          }
+        }
+      }
+      
+      // Clean up the name
+      let cleanName = result.name.trim();
+      
+      // Skip if this looks like concatenated ingredients (bad recipe data)
+      // e.g., "butter 2 Ripe Banana" has a number mid-string
+      if (/\s+\d+\s+[A-Z]/.test(cleanName)) {
+        // Try to extract just the first ingredient before the number
+        const match = cleanName.match(/^([^0-9]+?)(?=\s+\d)/);
+        if (match) {
+          cleanName = match[1].trim();
+        }
+      }
+      
+      // Handle fractions in the name field (if still there after initial parsing)
+      // Match "t baking powder" where "t" should be extracted as unit
+      const unitInName = cleanName.match(/^([a-z])\s+(.+)$/i);
+      if (unitInName && !result.unit) {
+        const potentialUnit = normalizeUnit(unitInName[1]);
+        if (potentialUnit) {
+          result.unit = potentialUnit;
+          cleanName = unitInName[2].trim();
+        }
+      }
+      
+      // Match "Cup sugar" or "cup Milk" where unit is capitalized in name
+      const capUnitInName = cleanName.match(/^(cup|tsp|tbsp|t)\s+(.+)$/i);
+      if (capUnitInName && !result.unit) {
+        result.unit = normalizeUnit(capUnitInName[1]);
+        cleanName = capUnitInName[2].trim();
+      }
+      
+      // Remove "or ..." alternatives - handle both "butter or margarine" and "or margarine"
+      cleanName = cleanName.replace(/^or\s+/i, '').trim(); // Remove "or" at start
+      cleanName = cleanName.replace(/\s+or\s+.*/i, '').trim(); // Remove " or ..." in middle
+      
+      // Strip instruction phrases from the name
+      const instructionPatterns = [
+        /[,–—-]\s*(beaten|mixed|chopped|diced|sliced|minced|crushed|grated|melted|softened|room temperature|cut into|finely|roughly|coarsely).*/gi,
+        /\s+to taste$/i,
+        /\s+optional$/i,
+        /\s+if needed$/i,
+        /\s+for serving$/i,
+        /\s+for garnish$/i,
+        /\s+\(.*?\)$/g
+      ];
+      
+      instructionPatterns.forEach(pattern => {
+        cleanName = cleanName.replace(pattern, '');
+      });
+      
+      // Skip if it's purely instructional text or empty
+      const skipPatterns = [/don't/i, /forget/i, /container/i, /take/i, /head of/i, /mix of/i, /^beaten/i, /^mixed/i, /^chopped/i, /^or$/i];
+      if (skipPatterns.some(p => p.test(cleanName)) || !cleanName) {
+        return { qty: 0, unit: '', name: '' };
+      }
+      
+      result.name = cleanName;
+      
+      // Strip quantity/unit prefix from name if qty/unit already provided
+      // e.g., "360 ml cup Milk" with qty=360, unit=ml should become just "Milk"
+      // Also handle single-letter units like "t" for teaspoon
+      if (result.qty && result.unit) {
+        // Remove leading number + unit pattern from name (including single-letter units)
+        result.name = result.name.replace(/^\d+(?:\.\d+)?\s*(?:g|kg|ml|l|tsp|t|tbsp|tbs|cup|c)\s+/i, '').trim();
+      }
+      
+      // Always try to strip quantity/unit prefix from name for unparsed cases
+      const m = result.name.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)\s+(.+)/);
+      if (m) {
+        const potentialQty = parseNumber(m[1]);
+        const potentialUnit = normalizeUnit(m[2]);
+        const restOfName = m[3];
+        
+        // Only use extracted values if qty wasn't already set
+        if (!result.qty && potentialQty) {
+          result.qty = potentialQty;
+        }
+        
+        // Only set unit if it wasn't already set AND the extracted unit looks valid
+        if (!result.unit && potentialUnit) {
+          result.unit = potentialUnit;
+        }
+        
+        // Always use the rest of the name (without the prefix)
+        result.name = restOfName;
+      }
+      
+      // Fix wrong unit assignments (flour in liters, etc.)
+      if (result.unit === 'l' || result.unit === 'ml') {
+        const dryGoods = ['flour', 'sugar', 'oats', 'rice', 'salt', 'baking powder', 'baking soda', 
+                          'chocolate chips', 'chocolate', 'chips', 'wholemeal', 'white sugar', 'brown sugar'];
+        if (dryGoods.some(item => result.name.toLowerCase().includes(item))) {
+          // Convert ml/l to grams (assuming 1ml = 1g for dry goods approximation)
+          if (result.unit === 'l') {
+            result.qty = result.qty * 1000;
+            result.unit = 'g';
+          } else if (result.unit === 'ml') {
+            result.unit = 'g';
+          }
+        }
+      }
+      
+      // If we have a quantity but no unit, try to infer it
+      if (result.qty && !result.unit) {
+        // Check if the quantity suggests grams (typically 50+)
+        if (result.qty >= 50 && result.qty <= 10000) {
+          const weightItems = ['butter', 'margarine', 'flour', 'sugar', 'cheese', 'chocolate', 'nuts', 
+                                'rice', 'pasta', 'oats', 'sultanas', 'chocolate chips', 'white sugar', 'brown sugar'];
+          if (weightItems.some(item => result.name.toLowerCase().includes(item))) {
+            result.unit = 'g';
+          }
+        }
+        // Check for liquids
+        const liquidItems = ['milk', 'water', 'oil', 'cream', 'juice', 'stock', 'broth', 'vinegar'];
+        if (liquidItems.some(item => result.name.toLowerCase().includes(item))) {
+          result.unit = result.qty >= 50 ? 'ml' : 'tbsp';
+        }
+      }
+      
+      result.unit = applyUnitlessHeuristic(result.name, result.unit);
+      result.name = collapseDuplicateWords(result.name.trim());
+      
+      return result;
+    }
+
+    function getTeacherLabel(b) {
+      if (b.last_name) {
+        return b.first_name ? `${b.last_name}, ${b.first_name}` : b.last_name;
+      }
+      return b.staff_code || 'Unknown teacher';
+    }
+
+    function updateSelectionDisplay() {
+      const listEl = document.getElementById('selectedList');
+      const notice = document.getElementById('selectionNotice');
+      listEl.innerHTML = '';
+      if (selection.size === 0) {
+        notice.style.display = 'block';
+        return;
+      }
+      notice.style.display = 'none';
+      const selectedBookings = bookings.filter(b => selection.has(b.id)).sort((a, b) => {
+        if (a.date_required === b.date_required) return a.period - b.period;
+        return a.date_required.localeCompare(b.date_required);
+      });
+      selectedBookings.forEach(b => {
+        const li = document.createElement('li');
+        const teacher = getTeacherLabel(b);
+        const dateObj = dates.find(d => d.date === b.date_required);
+        const day = dateObj ? `${dateObj.day_name} ${dateObj.nz_date}` : b.date_required;
+        li.textContent = `${teacher} | ${b.class_code || ''} | ${b.recipe_name || ''} | P${b.period} | ${day} | servings ${b.desired_servings || '—'}`;
+        listEl.appendChild(li);
+      });
+    }
+
+    function toggleBooking(id) {
+      if (selection.has(id)) selection.delete(id); else selection.add(id);
+      document.querySelectorAll(`[data-booking-id]`).forEach(el => {
+        const bid = parseInt(el.dataset.bookingId, 10);
+        if (selection.has(bid)) el.classList.add('selected'); else el.classList.remove('selected');
+      });
+      updateSelectionDisplay();
+    }
+
+    function selectAllWeek() {
+      bookings.forEach(b => selection.add(b.id));
+      document.querySelectorAll('[data-booking-id]').forEach(el => el.classList.add('selected'));
+      updateSelectionDisplay();
+    }
+
+    function clearAllSelections() {
+      selection.clear();
+      document.querySelectorAll('[data-booking-id]').forEach(el => el.classList.remove('selected'));
+      updateSelectionDisplay();
+      document.getElementById('listContent').textContent = 'Generate the shopping list to see items here.';
+    }
+
+    function aggregateItems() {
+      const ingredientMap = new Map();
+      const teacherMap = new Map();
+
+      selection.forEach(id => {
+        const booking = bookings.find(b => b.id === id);
+        if (!booking) return;
+        const recipe = recipes[booking.recipe_id];
+        if (!recipe || !Array.isArray(recipe.ingredients)) return;
+        const baseServings = parseNumber(recipe.serving_size) || 1;
+        const targetServings = parseNumber(booking.desired_servings) || baseServings;
+        const scale = targetServings / baseServings;
+        const teacherKey = getTeacherLabel(booking);
+        if (!teacherMap.has(teacherKey)) teacherMap.set(teacherKey, new Map());
+        const teacherItems = teacherMap.get(teacherKey);
+
+        recipe.ingredients.forEach(rawIng => {
+          const parsed = parseIngredient(rawIng);
+          // Skip empty/instruction items
+          if (!parsed.name || parsed.qty === 0) return;
+          const qty = parsed.qty || 1;
+          const scaledQty = qty * scale;
+          const base = convertToBase(scaledQty, parsed.unit, parsed.name);
+          const nameKey = normalizeName(parsed.name);
+          const displayName = collapseDuplicateWords(parsed.name.trim()) || 'Item';
+          const overallEntry = ingredientMap.get(nameKey) || { name: displayName, qty: 0, unit: base.unit };
+          // Always use cleaned name
+          overallEntry.name = displayName;
+          if (overallEntry.unit && base.unit && overallEntry.unit === base.unit) {
+            overallEntry.qty += base.qty;
+          } else if (!overallEntry.unit) {
+            overallEntry.qty += base.qty;
+            overallEntry.unit = base.unit;
+          } else {
+            overallEntry.qty += base.qty;
+          }
+          ingredientMap.set(nameKey, overallEntry);
+
+          const teacherEntry = teacherItems.get(nameKey) || { name: displayName, qty: 0, unit: base.unit };
+          // Always use cleaned name
+          teacherEntry.name = displayName;
+          if (teacherEntry.unit && base.unit && teacherEntry.unit === base.unit) {
+            teacherEntry.qty += base.qty;
+          } else if (!teacherEntry.unit) {
+            teacherEntry.qty += base.qty;
+            teacherEntry.unit = base.unit;
+          } else {
+            teacherEntry.qty += base.qty;
+          }
+          teacherItems.set(nameKey, teacherEntry);
+        });
+      });
+
+      return { ingredientMap, teacherMap };
+    }
+
+    async function toggleAlreadyHave(itemName, qty, unit) {
+      try {
+        const response = await fetch('/api/shopping-list/toggle-item', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            week_start: weekStart,
+            ingredient_name: itemName,
+            quantity: qty,
+            unit: unit
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          if (data.already_have) {
+            alreadyHaveItems.add(itemName);
+          } else {
+            alreadyHaveItems.delete(itemName);
+          }
+          renderShoppingList();
+        }
+      } catch (error) {
+        console.error('Error toggling item:', error);
+      }
+    }
+
+    async function loadAlreadyHaveStatus() {
+      try {
+        const response = await fetch('/api/shopping-list/get-status', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({week_start: weekStart})
+        });
+        const data = await response.json();
+        Object.keys(data.items).forEach(name => alreadyHaveItems.add(name));
+      } catch (error) {
+        console.error('Error loading status:', error);
+      }
+    }
+
+    function renderShoppingList() {
+      const target = document.getElementById('listContent');
+      target.innerHTML = '';
+      if (selection.size === 0) {
+        target.textContent = 'Select bookings then generate the shopping list.';
+        return;
+      }
+      const { ingredientMap, teacherMap } = aggregateItems();
+      const overall = Array.from(ingredientMap.values());
+      
+      // Group by category
+      const categorized = {};
+      overall.forEach(item => {
+        const category = categorizeIngredient(item.name);
+        if (!categorized[category]) categorized[category] = [];
+        categorized[category].push(item);
+      });
+      
+      // Sort categories and items within each category
+      const categoryOrder = ['Produce', 'Meat & Seafood', 'Dairy', 'Frozen', 'Pantry', 'Beverages', 'Other'];
+      const sortedCategories = categoryOrder.filter(cat => categorized[cat]);
+      
+      // Add summary stats
+      const summaryDiv = document.createElement('div');
+      summaryDiv.className = 'shopping-summary';
+      const notHaveCount = overall.filter(item => !alreadyHaveItems.has(item.name)).length;
+      summaryDiv.innerHTML = `
+        <div style="background: #e7f3ff; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+          <strong>📊 Summary:</strong> ${overall.length} unique ingredients | ${notHaveCount} needed | ${alreadyHaveItems.size} already have
+        </div>
+      `;
+      
+      const wrapper = document.createElement('div');
+      wrapper.appendChild(summaryDiv);
+      
+      // Render categorized list
+      const overallTitle = document.createElement('h3');
+      overallTitle.textContent = 'Shopping List by Category';
+      overallTitle.style.cssText = 'margin-top: 16px; margin-bottom: 12px;';
+      wrapper.appendChild(overallTitle);
+      
+      sortedCategories.forEach(category => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.style.cssText = 'margin-bottom: 20px; border-left: 4px solid #0066cc; padding-left: 12px;';
+        
+        const categoryTitle = document.createElement('h4');
+        categoryTitle.textContent = category;
+        categoryTitle.style.cssText = 'margin: 8px 0; color: #0066cc;';
+        categoryDiv.appendChild(categoryTitle);
+        
+        const list = document.createElement('ul');
+        list.className = 'shopping-items';
+        list.style.cssText = 'list-style: none; padding-left: 0;';
+        
+        categorized[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
+          const li = document.createElement('li');
+          li.style.cssText = 'padding: 6px 0; display: flex; align-items: center; gap: 10px;';
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = alreadyHaveItems.has(item.name);
+          checkbox.style.cssText = 'width: 20px; height: 20px; cursor: pointer;';
+          checkbox.className = 'no-print';
+          checkbox.onclick = () => toggleAlreadyHave(item.name, item.qty, item.unit);
+          
+          const label = document.createElement('span');
+          label.textContent = `${formatQtyUnit(item.qty, item.unit)} ${item.name}`.trim();
+          if (alreadyHaveItems.has(item.name)) {
+            label.style.cssText = 'text-decoration: line-through; color: #999;';
+          }
+          
+          li.appendChild(checkbox);
+          li.appendChild(label);
+          list.appendChild(li);
+        });
+        
+        categoryDiv.appendChild(list);
+        wrapper.appendChild(categoryDiv);
+      });
+
+      const teacherContainer = document.createElement('div');
+      teacherContainer.style.cssText = 'margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd;';
+      const teacherHeading = document.createElement('h3');
+      teacherHeading.textContent = 'By Teacher';
+      teacherContainer.appendChild(teacherHeading);
+      
+      const sortedTeachers = Array.from(teacherMap.keys()).sort((a, b) => a.localeCompare(b));
+      sortedTeachers.forEach(t => {
+        const block = document.createElement('div');
+        block.className = 'teacher-block';
+        const heading = document.createElement('div');
+        heading.innerHTML = `<strong>${t}</strong>`;
+        block.appendChild(heading);
+        const list = document.createElement('ul');
+        list.className = 'shopping-items';
+        const entries = Array.from(teacherMap.get(t).values()).sort((a, b) => a.name.localeCompare(b.name));
+        entries.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = `${formatQtyUnit(item.qty, item.unit)} ${item.name}`.trim();
+          list.appendChild(li);
+        });
+        block.appendChild(list);
+        teacherContainer.appendChild(block);
+      });
+
+      wrapper.appendChild(teacherContainer);
+      target.appendChild(wrapper);
+    }
+
+    function generateShoppingList() {
+      renderShoppingList();
+    }
+
+    function autoGenerateWeek() {
+      selectAllWeek();
+      generateShoppingList();
+      // Scroll to shopping list
+      document.getElementById('shoppingList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function exportShoppingListCsv() {
+      if (selection.size === 0) {
+        alert('Select bookings first.');
+        return;
+      }
+      const { ingredientMap, teacherMap } = aggregateItems();
+      let csv = `Week,,${weekLabel}\n`;
+      csv += '\nAll bookings\n';
+      csv += 'Qty,Unit,Item\n';
+      Array.from(ingredientMap.values()).sort((a,b) => a.name.localeCompare(b.name)).forEach(item => {
+        csv += `${item.qty},${item.unit || ''},"${item.name}"\n`;
+      });
+      csv += '\nBy teacher\n';
+      Array.from(teacherMap.keys()).sort((a,b) => a.localeCompare(b)).forEach(t => {
+        csv += `"${t}"\n`;
+        Array.from(teacherMap.get(t).values()).sort((a,b) => a.name.localeCompare(b.name)).forEach(item => {
+          csv += `${item.qty},${item.unit || ''},"${item.name}"\n`;
+        });
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'shopping_list.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    async function saveShoppingList() {
+      if (selection.size === 0) {
+        alert('Generate a shopping list first.');
+        return;
+      }
+      
+      const listName = prompt('Enter a name for this shopping list:', `Shopping List ${new Date().toLocaleDateString()}`);
+      if (!listName) return;
+      
+      const { ingredientMap } = aggregateItems();
+      const items = Array.from(ingredientMap.values()).map(item => ({
+        name: item.name,
+        quantity: item.qty,
+        unit: item.unit,
+        category: categorizeIngredient(item.name)
+      }));
+      
+      try {
+        const response = await fetch('/api/shopping-list/save', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            list_name: listName,
+            week_label: weekLabel,
+            items: items
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          alert(`Shopping list "${listName}" saved successfully!`);
+        }
+      } catch (error) {
+        console.error('Error saving list:', error);
+        alert('Failed to save shopping list');
+      }
+    }
+
+    async function loadShoppingList() {
+      try {
+        const response = await fetch('/api/shopping-list/saved');
+        const data = await response.json();
+        
+        if (!data.lists || data.lists.length === 0) {
+          alert('No saved shopping lists found.');
+          return;
+        }
+        
+        let listHTML = '<h3>Select a saved shopping list:</h3><ul style="list-style: none; padding: 0;">';
+        data.lists.forEach(list => {
+          const date = new Date(list.created_at).toLocaleDateString();
+          listHTML += `<li style="padding: 8px; margin: 4px 0; border: 1px solid #ddd; cursor: pointer;" onclick="loadListById(${list.id})">
+            <strong>${list.list_name}</strong><br>
+            <small>${list.week_label || ''} - Created: ${date}</small>
+          </li>`;
+        });
+        listHTML += '</ul>';
+        
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+        modal.innerHTML = `<div style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+          ${listHTML}
+          <button onclick="this.closest('div').parentElement.remove()" style="margin-top: 12px;">Close</button>
+        </div>`;
+        document.body.appendChild(modal);
+      } catch (error) {
+        console.error('Error loading lists:', error);
+        alert('Failed to load saved lists');
+      }
+    }
+
+    async function loadListById(listId) {
+      try {
+        const response = await fetch(`/api/shopping-list/load/${listId}`);
+        const data = await response.json();
+        
+        if (data.items) {
+          const target = document.getElementById('listContent');
+          target.innerHTML = '';
+          
+          const wrapper = document.createElement('div');
+          const title = document.createElement('h3');
+          title.textContent = data.list_name;
+          wrapper.appendChild(title);
+          
+          if (data.week_label) {
+            const weekInfo = document.createElement('p');
+            weekInfo.textContent = data.week_label;
+            weekInfo.style.cssText = 'color: #666; font-style: italic;';
+            wrapper.appendChild(weekInfo);
+          }
+          
+          // Group by category
+          const categorized = {};
+          data.items.forEach(item => {
+            const category = item.category || categorizeIngredient(item.name);
+            if (!categorized[category]) categorized[category] = [];
+            categorized[category].push(item);
+          });
+          
+          const categoryOrder = ['Produce', 'Meat & Seafood', 'Dairy', 'Frozen', 'Pantry', 'Beverages', 'Other'];
+          categoryOrder.filter(cat => categorized[cat]).forEach(category => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.style.cssText = 'margin-bottom: 20px; border-left: 4px solid #0066cc; padding-left: 12px;';
+            
+            const categoryTitle = document.createElement('h4');
+            categoryTitle.textContent = category;
+            categoryTitle.style.cssText = 'margin: 8px 0; color: #0066cc;';
+            categoryDiv.appendChild(categoryTitle);
+            
+            const list = document.createElement('ul');
+            list.className = 'shopping-items';
+            
+            categorized[category].forEach(item => {
+              const li = document.createElement('li');
+              li.textContent = `${formatQtyUnit(item.quantity, item.unit)} ${item.name}`.trim();
+              list.appendChild(li);
+            });
+            
+            categoryDiv.appendChild(list);
+            wrapper.appendChild(categoryDiv);
+          });
+          
+          target.appendChild(wrapper);
+          document.querySelector('[style*="rgba(0,0,0,0.5)"]')?.remove();
+        }
+      } catch (error) {
+        console.error('Error loading list:', error);
+        alert('Failed to load shopping list');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-booking-id]').forEach(el => {
+        el.addEventListener('click', () => toggleBooking(parseInt(el.dataset.bookingId, 10)));
+      });
+      updateSelectionDisplay();
+      loadAlreadyHaveStatus();
+    });
+  </script>
+</body>
+</html>

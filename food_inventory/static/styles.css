@@ -1,0 +1,1133 @@
+/* Global Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f6f8;
+  /* --- Sidebar & Topbar Layout --- */
+  .topbar {
+  color: #222;
+}
+
+h1 {
+  margin: 20px 0 8px;
+  padding: 0 16px;
+  font-size: 22px;
+}
+
+h2 {
+  margin: 16px 0 8px;
+  padding: 0 16px;
+  font-size: 18px;
+}
+  .topbar-left {
+
+/* Navigation Bar */
+nav, .navbar {
+  background: #fff;
+  .topbar-right {
+  border-bottom: 1px solid #ddd;
+  padding: 12px 16px;
+  margin: 0 0 16px 0;
+  display: flex;
+  .project-switcher {
+  justify-content: space-between;
+  align-items: center;
+}
+  .project-link {
+
+nav a, .navbar a {
+  text-decoration: none;
+  color: #0066cc;
+  margin-right: 12px;
+}
+
+  .project-link.active, .project-link:hover {
+nav a:hover, .navbar a:hover {
+  text-decoration: underline;
+}
+
+  .sidebar {
+
+.nav-brand {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+  .sidebar-header {
+.user-info {
+  color: #555;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  .sidebar-title {
+  gap: 8px;
+}
+
+.badge {
+  .sidebar-toggle {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  .sidebar-nav {
+}
+
+.badge-VP {
+  background: #d32f2f;
+}
+  .sidebar-nav a {
+
+.badge-DK {
+  background: #388e3c;
+}
+
+.badge-MU {
+  background: #1976d2;
+  .sidebar-nav a:hover, .sidebar-nav a.active {
+}
+
+.badge-public {
+
+  .main-content {
+  background: #757575;
+}
+
+.login-link, .logout-link {
+  padding: 6px 12px;
+  border-radius: 4px;
+
+  /* Collapsed sidebar for mobile */
+  @media (max-width: 900px) {
+    .sidebar {
+      transform: translateX(-100%);
+      width: 220px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+    }
+    .sidebar.collapsed {
+      transform: translateX(0);
+    }
+    .sidebar-toggle {
+      display: inline-block;
+    }
+    .main-content {
+      margin-left: 0;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+
+  @media (min-width: 901px) {
+    .sidebar {
+      transform: translateX(0);
+    }
+    .sidebar-toggle {
+      display: none;
+    }
+  }
+
+  /* When sidebar is collapsed, main content is full width */
+  .main-content.sidebar-collapsed {
+  background: #0066cc;
+  color: #fff !important;
+
+  body {
+}
+
+.login-link:hover, .logout-link:hover {
+  background: #0052a3;
+  text-decoration: none;
+}
+
+/* Alert Messages */
+.alert {
+  padding: 12px 16px;
+  margin: 0 0 16px 0;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-success {
+  background: #e8f5e9;
+  border-left: 4px solid #388e3c;
+  color: #1b5e20;
+}
+
+.alert-error, .alert-danger {
+  background: #ffebee;
+  border-left: 4px solid #d32f2f;
+  color: #b71c1c;
+}
+
+.alert-warning {
+  background: #fff3e0;
+  border-left: 4px solid #f57c00;
+  color: #e65100;
+}
+
+.alert-info {
+  background: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  color: #0d47a1;
+}
+
+.close-alert {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.close-alert:hover {
+  opacity: 1;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin: 0 0 16px 0;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: top;
+}
+
+th {
+  background: #f4f4f4;
+  text-align: left;
+  font-weight: 700;
+}
+
+/* Forms */
+form.search {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin: 6px 0 2px;
+}
+
+label.edit-recipe {
+  margin-top: 8px;
+}
+
+textarea {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  min-height: 120px;
+}
+
+button {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+button:hover {
+  background: #f2f4f8;
+}
+
+button.primary {
+  background: #0b6cfb;
+  border-color: #0b6cfb;
+  color: #fff;
+}
+
+button.primary:hover {
+  background: #0a60e0;
+}
+
+/* Custom Button Styles */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-calculate {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 16px;
+}
+
+.btn-calculate:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.btn-save {
+  background: #059669;
+  border-color: #059669;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 16px;
+}
+
+.btn-save:hover {
+  background: #047857;
+  border-color: #047857;
+}
+
+.btn-update {
+  background: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.btn-update:hover {
+  background: #d97706;
+  border-color: #d97706;
+}
+
+.btn-delete-booking {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn-delete-booking:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+/* Bookings Table */
+.bookings-table-wrapper {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.bookings-table thead {
+  background: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.bookings-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+.bookings-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.booking-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.booking-row:hover {
+  background-color: #f9fafb;
+}
+
+.booking-row.selected {
+  background-color: #dbeafe;
+}
+
+.booking-row.selected:hover {
+  background-color: #bfdbfe;
+}
+
+/* Utility Classes */
+.small {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.small-muted {
+  font-size: 12px;
+  color: #666;
+}
+
+details {
+  max-width: 60rem;
+}
+
+hr {
+  margin: 18px 0;
+}
+
+/* Shopping List Styles */
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.week-nav a {
+  padding: 6px 10px;
+  background: #0b6cfb;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.week-nav .label {
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.grid {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.grid th, .grid td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  vertical-align: top;
+  width: 20%;
+}
+
+.grid th {
+  background: #f0f3f7;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.period {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.booking {
+  background: #eef4ff;
+  border: 1px solid #c6d6ff;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.booking:hover {
+  background: #dce9ff;
+}
+
+.booking.selected {
+  background: #d1f2d6;
+  border-color: #7bcf8f;
+}
+
+.booking-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.booking-meta {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.35;
+}
+
+.empty {
+  color: #999;
+  font-size: 13px;
+}
+
+.actions {
+  margin: 16px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actions button {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.actions button.primary {
+  background: #0b6cfb;
+  border-color: #0b6cfb;
+  color: #fff;
+}
+
+.actions button:hover {
+  background: #f2f4f8;
+}
+
+.actions button.primary:hover {
+  background: #0a60e0;
+}
+
+.bottom-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+  margin-top: 12px;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #e2e6eb;
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.panel h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.selected-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selected-list li {
+  border: 1px dashed #d5d8dd;
+  border-radius: 6px;
+  padding: 8px;
+  background: #fafbfc;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.shopping-list {
+  background: #fff;
+  border: 1px solid #dfe5ec;
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.shopping-list h2 {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+}
+
+.shopping-list .week-label {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.shopping-items {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.teacher-block {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.notice {
+  margin-top: 8px;
+  padding: 10px;
+  background: #fff9e6;
+  border: 1px solid #f0d480;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.preview-banner {
+  margin: 8px 0;
+  padding: 8px 10px;
+  background: #ecf4ff;
+  border: 1px solid #cfe1ff;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* Booking Calendar Styles */
+.calendar-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendar-nav button {
+  padding: 8px 16px;
+  margin: 0 5px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.calendar-nav button:hover {
+  background: #f0f0f0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: #ddd;
+  border: 1px solid #ddd;
+}
+
+.calendar-day-header {
+  background: #f4f4f4;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #ddd;
+}
+
+.calendar-day {
+  background: white;
+  min-height: 100px;
+  padding: 8px;
+  position: relative;
+  border: 1px solid #ddd;
+}
+
+.calendar-day.other-month {
+  background: #f9f9f9;
+  color: #999;
+}
+
+.calendar-day.today {
+  background: #fff3cd;
+}
+
+.day-number {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.booking-item {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 3px;
+  padding: 4px 6px;
+  margin: 2px 0;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.booking-item:hover {
+  background: #c3e6cb;
+}
+
+.booking-details {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  z-index: 1000;
+  max-width: 500px;
+  width: 90%;
+}
+
+.booking-details.active {
+  display: block;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+}
+
+.overlay.active {
+  display: block;
+}
+
+.close-btn {
+  float: right;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  color: #999;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.google-cal-btn {
+  display: inline-block;
+  margin: 10px 0;
+  padding: 10px 20px;
+  background: #4285f4;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.google-cal-btn:hover {
+  background: #357ae8;
+}
+
+.export-options {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.legend {
+  margin: 20px 0;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.legend-item {
+  display: inline-block;
+  margin-right: 15px;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  vertical-align: middle;
+  border-radius: 3px;
+}
+
+/* Class Ingredients Styles */
+.row {
+  display: flex;
+  gap: 16px;
+}
+
+.col {
+  flex: 1;
+}
+
+.two-cols {
+  display: flex;
+  gap: 12px;
+}
+
+.left, .right {
+  flex: 1;
+}
+
+ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+optgroup {
+  font-weight: bold;
+  color: #333;
+}
+
+/* ===================================
+   MOBILE & TABLET RESPONSIVE DESIGN
+   =================================== */
+
+/* Tablet & Small Desktop (768px - 960px) */
+@media (max-width: 960px) {
+  .bottom-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Two-column layouts become single column */
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Mobile Devices (max-width: 768px) */
+@media (max-width: 768px) {
+  /* Body & Typography */
+  body {
+    font-size: 16px; /* Minimum 16px prevents zoom on iOS */
+  }
+  
+  h1 {
+    font-size: 20px;
+    padding: 0 12px;
+  }
+  
+  h2 {
+    font-size: 16px;
+    padding: 0 12px;
+  }
+  
+  /* Navigation - Mobile Friendly */
+  nav, .navbar {
+    flex-direction: column;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  
+  .nav-left, .nav-right {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    font-size: 14px;
+  }
+  
+  nav a, .navbar a {
+    margin: 0 6px;
+    padding: 8px 12px;
+    display: inline-block;
+  }
+  
+  /* Hide pipe separators on mobile */
+  .nav-left a::after {
+    content: none;
+  }
+  
+  /* Touch-friendly buttons */
+  button, input[type="submit"], .btn {
+    min-height: 44px; /* iOS touch target recommendation */
+    font-size: 16px;
+    padding: 12px 16px;
+    margin: 4px 0;
+  }
+  
+  /* Form inputs - prevent zoom on focus */
+  input, select, textarea {
+    font-size: 16px !important;
+    padding: 12px;
+    min-height: 44px;
+  }
+  
+  /* Tables - Scrollable on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 14px;
+  }
+  
+  table th, table td {
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+  
+  /* Recipe Grid - Single column on small screens */
+  .recipe-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+    padding: 0 8px;
+  }
+  
+  .recipe-card {
+    padding: 12px;
+  }
+  
+  /* Admin panels */
+  .admin-container {
+    padding: 0 8px;
+  }
+  
+  .admin-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+  
+  .panel {
+    padding: 12px;
+  }
+  
+  /* Two-column layouts stack vertically */
+  .row, .two-cols {
+    flex-direction: column;
+  }
+  
+  .col, .left, .right {
+    width: 100%;
+  }
+  
+  /* View toggle buttons */
+  .view-toggle {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  /* Shopping list */
+  .shopping-list {
+    padding: 12px;
+    margin: 8px;
+  }
+  
+  .week-nav {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+  
+  .week-nav a {
+    padding: 10px 16px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Booking calendar */
+  .grid {
+    font-size: 12px;
+  }
+  
+  .grid th, .grid td {
+    padding: 4px 2px;
+  }
+  
+  /* Class ingredients form */
+  .class-form {
+    padding: 12px;
+  }
+  
+  /* Recipe details */
+  .recipe-detail {
+    padding: 12px;
+  }
+  
+  .ingredient-list li {
+    font-size: 15px;
+    padding: 6px 0;
+  }
+  
+  /* Modal dialogs */
+  .modal-content {
+    width: 95% !important;
+    margin: 10% auto;
+  }
+  
+  /* Hide less critical info on mobile */
+  .mobile-hide {
+    display: none;
+  }
+  
+  /* Favorite buttons - larger touch targets */
+  .favorite-btn {
+    font-size: 24px !important;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px;
+  }
+  
+  /* Container padding */
+  .container {
+    padding: 8px;
+  }
+  
+  /* Forms - full width on mobile */
+  form {
+    width: 100%;
+  }
+  
+  form input[type="text"],
+  form input[type="number"],
+  form input[type="url"],
+  form input[type="email"],
+  form textarea,
+  form select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Permissions table */
+  #permissions-table {
+    font-size: 12px;
+  }
+  
+  #permissions-table th,
+  #permissions-table td {
+    padding: 6px 4px;
+  }
+  
+  /* Badge sizing */
+  .badge {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+}
+
+/* Small phones (max-width: 480px) */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 18px;
+  }
+  
+  h2 {
+    font-size: 15px;
+  }
+  
+  nav a, .navbar a {
+    font-size: 13px;
+    margin: 0 4px;
+    padding: 6px 8px;
+  }
+  
+  .recipe-card h3 {
+    font-size: 16px;
+  }
+  
+  table {
+    font-size: 12px;
+  }
+  
+  table th, table td {
+    padding: 6px 4px;
+  }
+  
+  button {
+    width: 100%;
+  }
+  
+  /* Stack week navigation vertically */
+  .week-nav {
+    align-items: stretch;
+  }
+  
+  /* Smaller grid cells */
+  .grid {
+    font-size: 10px;
+  }
+  
+  .grid th, .grid td {
+    padding: 3px 1px;
+  }
+}
+
+/* Landscape mode optimizations */
+@media (max-width: 960px) and (orientation: landscape) {
+  nav, .navbar {
+    flex-direction: row;
+    padding: 6px 12px;
+  }
+  
+  h1 {
+    margin: 12px 0 6px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+  
+  .no-print,
+  .week-nav,
+  h1,
+  .grid,
+  .actions,
+  .preview-banner,
+  .panel {
+    display: none !important;
+  }
+  
+  .bottom-layout {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+  }
+  
+  .shopping-list {
+    border: none !important;
+    box-shadow: none !important;
+    display: block !important;
+    page-break-inside: avoid;
+  }
+}
+
+/* Dietary Tags */
+.diet-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  margin: 2px;
+  background: #e7f3ff;
+  color: #0066cc;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid #b3d9ff;
+  white-space: nowrap;
+}
+
+.diet-tag:nth-child(2n) {
+  background: #fff3e0;
+  color: #e65100;
+  border-color: #ffcc80;
+}
+
+.diet-tag:nth-child(3n) {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-color: #a5d6a7;
+}

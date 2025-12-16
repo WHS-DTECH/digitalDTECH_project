@@ -1,0 +1,111 @@
+<!DOCTYPE html> 
+<html> 
+  <head> <!-- recipe_details.html--> 
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Details</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head> 
+  <body> 
+    <nav>
+      <a href="/">Dashboard</a> |
+      <a href="/recipes">Recipes</a> |
+      <a href="/recbk">Recipe Book</a> |
+      <a href="/class_ingredients">Class Ingredients</a> |
+      <a href="/booking">Booking Calendar</a> |
+      <a href="/shoplist">Shopping List</a> |
+      <a href="/admin">Admin</a>
+    </nav>
+
+<h2>{{ recipe.name }}</h2>
+
+<!-- Recipe Tags & Info -->
+<div style="background:#f9f9f9; border:1px solid #ddd; padding:12px; margin:12px 0; border-radius:6px; max-width:600px;">
+  <div style="margin-bottom:8px;">
+    <strong>Tags:</strong>
+    {% if recipe.dietary_tags %}
+      {% for tag in recipe.dietary_tags.split(',') %}
+        <span class="diet-tag">{{ tag.strip() }}</span>
+      {% endfor %}
+    {% else %}
+      <span style="color:#999;">No tags</span>
+    {% endif %}
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+    <div><strong>Cuisine:</strong> {{ recipe.cuisine or '—' }}</div>
+    <div><strong>Difficulty:</strong> {{ recipe.difficulty or '—' }}</div>
+  </div>
+</div>
+
+{% if recipe.photo %}
+  <div>
+    <img src="{{ url_for('static', filename='uploads/recipes/' ~ recipe.photo) }}" alt="{{ recipe.name }}" style="max-width:400px; height:auto;" />
+  </div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+  <label for="photo">Upload photo (optional):</label>
+  <input type="file" name="photo" accept="image/*" />
+  <button type="submit">Upload</button>
+</form>
+
+<p><a href="/admin/recipe/{{ recipe.id }}/edit">Edit recipe</a></p>
+
+{% if recipe.photo %}
+  <form method="post" onsubmit="return confirm('Delete this photo?');">
+    <input type="hidden" name="delete_photo" value="1" />
+    <button type="submit">Delete photo</button>
+  </form>
+{% endif %}
+
+<p><strong>Instructions:</strong></p>
+<pre style="white-space: pre-wrap">{{ recipe.instructions }}</pre>
+<p><strong>Serving Size:</strong> {{ recipe.serving_size or '—' }}</p>
+
+{% if nutrition %}
+  <div style="border:1px solid #ddd; padding:10px; margin:10px 0; max-width:420px;">
+    <strong>Nutrition (estimated)</strong>
+    <div style="margin-top:6px;">
+      {% if nutrition.gluten_free %}
+        <span style="background:#dff0d8;color:#3c763d;padding:4px 8px;border-radius:4px;margin-right:6px;">Likely Gluten Free</span>
+      {% else %}
+        <span style="background:#f2dede;color:#a94442;padding:4px 8px;border-radius:4px;margin-right:6px;">May contain Gluten</span>
+      {% endif %}
+      {% if nutrition.dairy_free %}
+        <span style="background:#dff0d8;color:#3c763d;padding:4px 8px;border-radius:4px;">Likely Dairy Free</span>
+      {% else %}
+        <span style="background:#f2dede;color:#a94442;padding:4px 8px;border-radius:4px;">May contain Dairy</span>
+      {% endif %}
+    </div>
+
+    <div style="margin-top:8px;">
+      <div><strong>Total:</strong> {{ nutrition.total.kcal }} kcal — {{ nutrition.total.protein }}g protein, {{ nutrition.total.carbs }}g carbs, {{ nutrition.total.fat }}g fat</div>
+      {% if nutrition.per_serving %}
+        <div><strong>Per serving:</strong> {{ nutrition.per_serving.kcal }} kcal — {{ nutrition.per_serving.protein }}g protein, {{ nutrition.per_serving.carbs }}g carbs, {{ nutrition.per_serving.fat }}g fat</div>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+<h3>Ingredients</h3>
+<ul>
+  {% for ing in ingredients %}
+    <li>
+      {% if ing.quantity or ing.unit %}
+        {{ ing.quantity }} {{ ing.unit }}
+      {% endif %}
+      {{ ing.ingredient }}
+    </li>
+  {% endfor %}
+</ul>
+
+<h3>Equipment</h3>
+<ul>
+  {% for item in equipment %}
+    <li>{{ item }}</li>
+  {% endfor %}
+</ul>
+
+</body>
+
+</html>

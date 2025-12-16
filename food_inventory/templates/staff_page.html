@@ -1,0 +1,87 @@
+<!DOCTYPE html> 
+<html> 
+  <head> <!-- teachers.html--> 
+  <title>Teachers</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    </head> 
+    <body> 
+      <nav>
+        <a href="/">Dashboard</a> |
+        <a href="/recipes">Recipes</a> |
+        <a href="/recbk">Recipe Book</a> |
+        <a href="/class_ingredients">Class Ingredients</a> |
+        <a href="/booking">Booking Calendar</a> |
+        <a href="/shoplist">Shopping List</a> |
+        <a href="/admin">Admin</a>
+      </nav>
+
+      <main>
+        <h1>Staff</h1>
+        
+        <table>
+          <thead>
+            <tr>
+              
+              <th>code</th>
+              
+              <th>last_name</th>
+              
+              <th>first_name</th>
+              
+              <th>title</th>
+              
+              <th>email</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            
+            <tr>
+              
+              <td>JD</td>
+              
+              <td>Doe</td>
+              
+              <td>John</td>
+              
+              <td>Mr</td>
+              
+              <td>john.doe@school.edu</td>
+              
+            </tr>
+            
+            <tr>
+              
+              <td>VP</td>
+              
+              <td>Pringle</td>
+              
+              <td>Vanessa</td>
+              
+              <td>Ms</td>
+              
+              <td>vanessa.pringle@school.edu</td>
+              
+            </tr>
+            
+            <tr>
+              
+              <td>AS</td>
+              
+              <td>Smith</td>
+              
+              <td>Alice</td>
+              
+              <td>Mrs</td>
+              
+              <td>alice.smith@school.edu</td>
+              
+            </tr>
+            
+          </tbody>
+        </table>
+        
+      </main>
+
+  </body>
+  </html>
