@@ -1,7 +1,8 @@
 
+
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../food_inventory'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'food_inventory'))
 from flask import Flask, render_template
 from app import app as food_inventory_app
 
