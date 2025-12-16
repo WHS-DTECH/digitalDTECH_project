@@ -1,8 +1,10 @@
 
+
 from flask import Blueprint, render_template, request
 import json
 import sqlite3
 from flask_login import current_user
+import os
 
 # Define the Blueprint at the top before any route decorators
 food_inventory_bp = Blueprint(
@@ -14,7 +16,6 @@ food_inventory_bp = Blueprint(
 )
 
 # Recipe Book (recbk) route (moved from app.py)
-
 @food_inventory_bp.route('/recbk')
 def recbk():
     db_path = os.path.join(os.path.dirname(__file__), 'recipes.db')
