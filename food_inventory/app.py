@@ -1782,7 +1782,7 @@ def edit_recipe(recipe_id):
             equipment = []
 
     # Prepare textareas content
-    ingredients_text = '\n'.join([f"{it.get('quantity','')} {it.get('unit','')} {it.get('ingredient','')}'.strip()" for it in ingredients])
+    ingredients_text = '\n'.join([f"{it.get('quantity','')} {it.get('unit','')} {it.get('ingredient','')}".strip() for it in ingredients])
     equipment_text = '\n'.join(equipment)
 
     return render_template('edit_recipe.html', recipe=recipe, ingredients_text=ingredients_text, equipment_text=equipment_text)
@@ -1982,7 +1982,7 @@ def extract_recipe_from_url(url):
                         ingredient_text += f' ({desc_text})'
                     else:
                         # Just append without parens for things like "crushed", "sliced", etc.
-                        ingredient_text += f', {desc_text}'
+                        ingredient_text += f' , {desc_text}'
                 
                 # For countable items without a standard unit, add "no." after quantity
                 # Check if ingredient_text contains words that are typically countable items
