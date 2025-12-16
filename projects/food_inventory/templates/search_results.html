@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<!-- search_results.html-->
+ <title>Search Results</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+
+<body>
+   <nav>
+      <a href="/">Dashboard</a> |
+      <a href="/recipes">Recipes</a> |
+      <a href="/recbk">Recipe Book</a> |
+      <a href="/class_ingredients">Class Ingredients</a> |
+      <a href="/booking">Booking Calendar</a> |
+      <a href="/shoplist">Shopping List</a> |
+      <a href="/admin">Admin</a>
+   </nav>
+</nav>
+
+<h2>Search Results for "{{ query }}"</h2>
+
+<ul>
+
+{% for r in results %}
+<li><a href="/recipe/{{ r[0] }}">{{ r[1] }}</a></li>
+{% endfor %}
+
+</ul>
+
+</body>
+
+</html>">Teachers</a>
+
+<a href="/admin">Admin</a>
+
+</nav>
+
+<h2>Search Results for "{{ query }}"</h2>
+
+<ul>
+
+{% for r in results %}
+
+<li><a href="/recipe/{{ r[0] }}">{{ r[1] }}</a></li>
+
+{% endfor %}
+
+</ul>
+
+</body>
+
+</html>

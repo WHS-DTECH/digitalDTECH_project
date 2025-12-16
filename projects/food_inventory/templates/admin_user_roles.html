@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Manage User Roles{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>User Role Management</h1>
+    <p class="recipe-method-desc">Assign additional roles to users beyond their primary staff code role.</p>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div style="margin: 20px 0; padding: 15px; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; color: #155724;">
+                {% for message in messages %}
+                    {{ message }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div style="margin: 20px 0;">
+        <a href="/admin" style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px;">← Back to Admin</a>
+        <a href="/admin/permissions" style="display: inline-block; padding: 10px 20px; background-color: #17a2b8; color: white; text-decoration: none; border-radius: 4px; margin-left: 8px;">Manage Route Permissions</a>
+    </div>
+
+    <!-- Add Role to User Form -->
+    <div class="panel" style="margin: 20px 0; padding: 20px; background: white; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3>Add Role to User</h3>
+        <form method="post" style="display: grid; gap: 12px; max-width: 600px;">
+            <div>
+                <label for="email" style="display: block; margin-bottom: 4px; font-weight: bold;">User Email:</label>
+                <select id="email" name="email" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">-- Select a user --</option>
+                    {% for teacher in teachers %}
+                        <option value="{{ teacher.email }}">{{ teacher.email }} ({{ teacher.code }} - {{ teacher.last_name }}, {{ teacher.first_name }})</option>
+                    {% endfor %}
+                </select>
+                <small style="color: #666;">Or type any email address:</small>
+                <input type="email" id="custom_email" placeholder="user@example.com" style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div>
+                <label for="role" style="display: block; margin-bottom: 4px; font-weight: bold;">Role to Add:</label>
+                <select id="role" name="role" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">-- Select a role --</option>
+                    {% for role in roles %}
+                        <option value="{{ role }}">
+                            {% if role == 'VP' %}Admin
+                            {% elif role == 'DK' %}Teacher
+                            {% elif role == 'MU' %}Technician
+                            {% elif role == 'public' %}Public Access
+                            {% else %}{{ role }}
+                            {% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <input type="hidden" name="action" value="add">
+            <button type="submit" class="primary" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Add Role</button>
+        </form>
+    </div>
+
+    <!-- Current User Roles -->
+    <div class="panel" style="margin: 20px 0; padding: 20px; background: white; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3>Users with Additional Roles</h3>
+        
+        {% if users_with_roles and users_with_roles|length > 0 %}
+            <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                        <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6;">Email</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6;">Additional Roles</th>
+                        <th style="padding: 12px; text-align: center; border: 1px solid #dee2e6;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users_with_roles %}
+                    <tr style="border-bottom: 1px solid #dee2e6;">
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">{{ user.email }}</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">
+                            <span style="background-color: #e7f3ff; padding: 4px 8px; border-radius: 4px; font-weight: bold;">{{ user.roles }}</span>
+                        </td>
+                        <td style="padding: 12px; text-align: center; border: 1px solid #dee2e6;">
+                            <button onclick="showRemoveForm('{{ user.email }}', '{{ user.roles }}')" style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Remove Roles</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color: #666; margin-top: 12px;">No users have additional roles assigned yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Remove Role Modal -->
+    <div id="removeModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 24px; border-radius: 8px; max-width: 500px; width: 90%;">
+            <h3>Remove Role from User</h3>
+            <form method="post" id="removeForm">
+                <input type="hidden" name="email" id="remove_email">
+                <input type="hidden" name="action" value="remove">
+                
+                <div style="margin: 16px 0;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Select role to remove:</label>
+                    <select name="role" id="remove_role" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-top: 16px;">
+                    <button type="submit" style="flex: 1; padding: 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Remove Role</button>
+                    <button type="button" onclick="closeRemoveModal()" style="flex: 1; padding: 10px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div style="margin: 30px 0; padding: 20px; background-color: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px;">
+        <h3 style="margin-top: 0;">How It Works</h3>
+        <ul style="line-height: 1.8;">
+            <li><strong>Primary Role:</strong> Users automatically get their primary role from their staff code in the teachers table</li>
+            <li><strong>Additional Roles:</strong> You can assign extra roles here to give users access to more features</li>
+            <li><strong>Combined Access:</strong> Users will have access to all routes allowed by any of their roles</li>
+            <li><strong>Example:</strong> A teacher can be given Admin role to access admin features without changing their staff code</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Use custom email if entered
+document.getElementById('custom_email').addEventListener('change', function() {
+    if (this.value) {
+        document.getElementById('email').value = '';
+        document.getElementById('email').setAttribute('name', '');
+        this.setAttribute('name', 'email');
+    }
+});
+
+document.getElementById('email').addEventListener('change', function() {
+    if (this.value) {
+        document.getElementById('custom_email').value = '';
+        document.getElementById('custom_email').setAttribute('name', '');
+        this.setAttribute('name', 'email');
+    }
+});
+
+function showRemoveForm(email, rolesStr) {
+    document.getElementById('remove_email').value = email;
+    const select = document.getElementById('remove_role');
+    select.innerHTML = '';
+    
+    const roles = rolesStr.split(', ');
+    roles.forEach(role => {
+        const option = document.createElement('option');
+        option.value = role.trim();
+        option.textContent = role.trim();
+        select.appendChild(option);
+    });
+    
+    document.getElementById('removeModal').style.display = 'flex';
+}
+
+function closeRemoveModal() {
+    document.getElementById('removeModal').style.display = 'none';
+}
+
+// Close modal on background click
+document.getElementById('removeModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRemoveModal();
+    }
+});
+</script>
+{% endblock %}

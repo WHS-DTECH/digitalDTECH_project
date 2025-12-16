@@ -1,0 +1,643 @@
+[
+  {
+    "id": 1,
+    "name": "Chocolate Chip Cookies",
+    "ingredients": [
+      {
+        "quantity": "2",
+        "unit": "cups",
+        "ingredient": "Flour"
+      },
+      {
+        "quantity": "1",
+        "unit": "cup",
+        "ingredient": "Butter (softened)"
+      },
+      {
+        "quantity": "0.75",
+        "unit": "cup",
+        "ingredient": "Brown sugar"
+      },
+      {
+        "quantity": "0.5",
+        "unit": "cup",
+        "ingredient": "Granulated sugar"
+      },
+      {
+        "quantity": "2",
+        "unit": "whole",
+        "ingredient": "Eggs"
+      },
+      {
+        "quantity": "1",
+        "unit": "tsp",
+        "ingredient": "Vanilla extract"
+      },
+      {
+        "quantity": "1",
+        "unit": "tsp",
+        "ingredient": "Baking soda"
+      },
+      {
+        "quantity": "0.5",
+        "unit": "tsp",
+        "ingredient": "Salt"
+      },
+      {
+        "quantity": "2",
+        "unit": "cups",
+        "ingredient": "Chocolate chips"
+      }
+    ],
+    "instructions": "Mix dry ingredients. Add wet ingredients. Drop onto baking sheet. Bake at 350F for 12 minutes.",
+    "serving_size": 24,
+    "equipment": [
+      "Mixing bowl|Measuring cups|Baking sheet|Oven"
+    ],
+    "photo": null
+  },
+  {
+    "id": 3,
+    "name": "Cauliflower Chee se",
+    "ingredients": [
+      {
+        "quantity": "1.0",
+        "unit": "head",
+        "ingredient": "of cauliflower OR 1 head of broccoli OR a mix of both"
+      },
+      {
+        "quantity": "50.0",
+        "unit": "plain",
+        "ingredient": "flour"
+      },
+      {
+        "quantity": "500.0",
+        "unit": "milk",
+        "ingredient": "milk"
+      },
+      {
+        "quantity": "50.0",
+        "unit": "butter",
+        "ingredient": "butter"
+      },
+      {
+        "quantity": "100.0",
+        "unit": "grated",
+        "ingredient": "cheese"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Black pepper"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1-2 tblsp fresh breadcrumbs"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Don’t forget a container to take your cauliflower cheese home in"
+      }
+    ],
+    "instructions": "1. 2cm hot water into a pan\n2.  Bring to the boil, add the vegetables and cover with a lid\n3.  Cook for 5mins maximum then drain using a colander then place them in a\ndish\n4.  Put the butter into a pan and melt it\n5.  Add flour and stir to form a paste\n6.  Gradually add the milk – keep stirring until it thickens.\n7.  Remove from the heat and stir in most of the cheese. Season.\n8.  Pour over the veg.\n9. Sprinkle on breadcrumbs and the remaining cheese\n10. Grill under  a hot grill until golden brown.\nFeeling a dventurous?  You could….\n• Try using different vegetables\n• Add herbs to the sauce",
+    "serving_size": 1,
+    "equipment": [],
+    "photo": null
+  },
+  {
+    "id": 4,
+    "name": "Mini Carrot Cakes",
+    "ingredients": [
+      {
+        "quantity": "150.0",
+        "unit": "margarine",
+        "ingredient": "150g margarine"
+      },
+      {
+        "quantity": "250.0",
+        "unit": "carrots",
+        "ingredient": "250g carrots"
+      },
+      {
+        "quantity": "200.0",
+        "unit": "sugar",
+        "ingredient": "200g sugar"
+      },
+      {
+        "quantity": "2.0",
+        "unit": "large",
+        "ingredient": "eggs"
+      },
+      {
+        "quantity": "200.0",
+        "unit": "flour",
+        "ingredient": "200g flour"
+      },
+      {
+        "quantity": "2.0",
+        "unit": "",
+        "ingredient": "5 ml cinnamon"
+      },
+      {
+        "quantity": "2.0",
+        "unit": "",
+        "ingredient": "5ml baking powder"
+      },
+      {
+        "quantity": "125.0",
+        "unit": "sultanas",
+        "ingredient": "125g sultanas"
+      },
+      {
+        "quantity": "50.0",
+        "unit": "nuts",
+        "ingredient": "50g nuts"
+      }
+    ],
+    "instructions": "1. Preheat the oven to 200oC or gas mark 6.\n2. Melt the margarine in a saucepan .\n3. Top and tail, and then peel and grate the carrots.\n4. Combine the carrots, sugar and margarine in the mining bowl.\n5. Sift in the flour, cinnamon and baking powder.\n6. Beat the eggs in a small bowl, and then add to the mixture.\n7. Mix in the sultanas and nuts.\n8. Divide the mixture equally between the muffin cases, using the two metal spoons.\n9. Bake for 20 minutes.",
+    "serving_size": 1,
+    "equipment": [
+      "Muffin tray",
+      "scales",
+      "sieve",
+      "saucepan chopping board",
+      "knife",
+      "grater",
+      "small bowl",
+      "mixing bowl",
+      "wooden spoon"
+    ],
+    "photo": null
+  },
+  {
+    "id": 5,
+    "name": "Making Activity 1: Mushr oom Risotto",
+    "ingredients": [
+      {
+        "quantity": "150.0",
+        "unit": "chestnut",
+        "ingredient": "mushrooms"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "onion",
+        "ingredient": "1 onion"
+      },
+      {
+        "quantity": "2.0",
+        "unit": "cloves",
+        "ingredient": "garlic"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "",
+        "ingredient": "15ml spoon olive oil"
+      },
+      {
+        "quantity": "250.0",
+        "unit": "risotto",
+        "ingredient": "rice"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "",
+        "ingredient": "5ml spoon vegetable stock powder"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1-1.5 litres water, boiling"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "",
+        "ingredient": "15ml spoon parmesan, grated"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "",
+        "ingredient": "10ml spoon thyme, chopped"
+      }
+    ],
+    "instructions": "1. Prepare the vegetables:\n2. peel and chop the onion;\n3. slice the mushrooms;\n4. Peel and crush the garlic.\n5. Fry the onion and garlic in the oil until softened.\n6. Add the mushrooms, and fry f or another 2 minutes.\n7. Stir in the rice.\n8. Mix the stock powder with the water.\n9. Add a little o f the stock to the rice - a little at a time.  Wait for the stock to be absorbed, stirring\nconstantly.\n10. Continue adding the stock until the rice cooks – this will tak e 20-25 minutes. The rice should be soft, but\nstill retain a nutty bite.\n11. Stir in the parmes an and thyme into the rice.",
+    "serving_size": 1,
+    "equipment": [
+      "Weighing scale s",
+      "chopping board",
+      "knife",
+      "wooden spoon",
+      "frying pan",
+      "spoon",
+      "mixing bowl"
+    ],
+    "photo": null
+  },
+  {
+    "id": 6,
+    "name": "Fajitas",
+    "ingredients": [
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1/2 lime"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1/2 green chilli"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "clove",
+        "ingredient": "garlic"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1x15ml spoon coriander"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1x10ml spoon oil"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "small",
+        "ingredient": "chicken breast (or 3 -4 boneless thighs or vegetarian substitute eg quorn"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1/2 onion"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1/2 green pepper"
+      },
+      {
+        "quantity": "2.0",
+        "unit": "tortillas",
+        "ingredient": "2 tortillas"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "tomato",
+        "ingredient": "1 tomato"
+      },
+      {
+        "quantity": "25.0",
+        "unit": "Cheddar",
+        "ingredient": "cheese"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1x15ml spoon guacamole (or salsa), optional"
+      }
+    ],
+    "instructions": "1. Prepare the marinade:\n· squeeze the lime;\n· peel and crush t he garlic;\n· de-seed and slice the chilli;\n· chop the coriander;\n· stir everything together with the oil.\n2. Remove any skin from the chicken and cut into strips. Mix with the marinade and place in the fridge, covered,\nuntil needed.\n3. Prepare the remainin g ingredients with a fresh knife on a clean chopping board:\n· slice the onion and g reen pepper;\n· chop the tomato;\n· grate the cheese.\n4. Add the marinated chicken to the wok or frying pan and stir -fry for about 4 minutes. Check that the  chicken is\ncooked.\n5. Add the onion and green pepper and continue to cook for a further 2 minutes.\n6. Spread a little chicken in the centre of the tortilla, add some tomato, cheese and guacamole, then roll up.",
+    "serving_size": 1,
+    "equipment": [
+      "weighing scales",
+      "chopping board",
+      "knife",
+      "wooden spoon",
+      "frying pan/wok",
+      "spoon",
+      "mixing bowl"
+    ],
+    "photo": null
+  },
+  {
+    "id": 7,
+    "name": "Vegetable Couscous",
+    "ingredients": [
+      {
+        "quantity": "170.0",
+        "unit": "water,",
+        "ingredient": "boiling"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "vegetable",
+        "ingredient": "stock cube"
+      },
+      {
+        "quantity": "100.0",
+        "unit": "couscous",
+        "ingredient": "100g couscous"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "medium",
+        "ingredient": "tomato"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "spring",
+        "ingredient": "onion"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "¼ cucumber"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ yellow pepper"
+      },
+      {
+        "quantity": "4.0",
+        "unit": "dried",
+        "ingredient": "apricots"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "",
+        "ingredient": "15ml spoon parsley"
+      },
+      {
+        "quantity": "2.0",
+        "unit": "",
+        "ingredient": "15ml spoons low fat dressing"
+      }
+    ],
+    "instructions": "1. Make up the stock by dissolving the stock cube in the boiling water.\n2. Pour the stock over the couscous in a large bowl.\n3. Fluff with a fork and leave to stand for 5 minutes.\n4. Chop the tomato and cucumber into small chunks.\n5. Slice the pepper into small strips.\n6. Slic e the dried apricots and parsley into small pieces.\n7. Add all the vegetables to the couscous and snip the spring onions into the bowl using the scissors.\n8. Stir everything together.\n9. Add the dressing.",
+    "serving_size": 1,
+    "equipment": [
+      "Kettle",
+      "measuring jug",
+      "measuring spoons",
+      "weighing scales",
+      "large bowl",
+      "fork",
+      "chopping board",
+      "sharp knife",
+      "can opener",
+      "scissors",
+      "mixing spoon."
+    ],
+    "photo": null
+  },
+  {
+    "id": 8,
+    "name": "Pizza",
+    "ingredients": [
+      {
+        "quantity": "500.0",
+        "unit": "wh",
+        "ingredient": "ite strong bread flour"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1x 7g packet or 2 teaspoons fast action dried yeast"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "tablespoon",
+        "ingredient": "oil"
+      },
+      {
+        "quantity": "2.0",
+        "unit": "teaspoons",
+        "ingredient": "salt"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "teaspoon",
+        "ingredient": "sugar"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Warm water"
+      },
+      {
+        "quantity": "3.0",
+        "unit": "tablespoons",
+        "ingredient": "of Tomato puree or 400g tinned tomatoes"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "A range of toppings ; e.g. sliced peppers, mushrooms , grated che ddar or  sliced mozzarella, cooked"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "bacon, t inned sweetcorn, sliced ham or cooked bacon, salami, pineapple ."
+      }
+    ],
+    "instructions": "1. Preheat the oven at 2200 C or Gas Mark 7\n2. Sieve the flour and salt into a bowl and stir in the dried yeast and sugar\n3. Add the oil and start to add warm water gradually adding a little at a ti me.  With your hands or a spoon\ngradually bring the dough together.  It should feel s lightly sticky.  If it is very sticky add a little more flour, if\nit is very dry still add a little more warm water.\n4. Flour a work surface and knead the dough until it is smooth and stretchy, at least 5 minutes\n5. Roll the dough out to a large circle and place it onto t he baking tray.  Place into the top oven to prove if there is\ntime.\n6. Spoon over the tomato puree if using.  If using tinned tomatoes drain off the liquid before spreading them over\nthe pizza base\n7. Scatter your chosen in gredien ts over the pizza base, putting the cheese on last.\n8. Bake for 15 minutes until the base looks cooked and the cheese is golden brown .",
+    "serving_size": 1,
+    "equipment": [
+      "weighing scales",
+      "measuring spoons",
+      "mixing bowl",
+      "wooden spoon",
+      "rolling pin",
+      "baking tray"
+    ],
+    "photo": null
+  },
+  {
+    "id": 9,
+    "name": "Beef Nachos (per group of 4)",
+    "ingredients": [
+      "100g beef mince",
+      "1 Brown onion diced",
+      "1 T minced garlic",
+      "¼ can of chilli beans",
+      "2 T Tomato paste",
+      "½ can chopped tomatoes",
+      "½ cup frozen corn",
+      "1 carrot grated",
+      "½  c beef stock ( 1 beef stock cube + ½ c water)",
+      "½ t smoked paprika",
+      "½ t dried oregano",
+      "½ t onion powder",
+      "½ t ground cumin",
+      "½ t ground coriander"
+    ],
+    "instructions": "1. Heat a little oil in a large frying pan on high heat cook mince, garlic and onion\nbreaking up mince with a wooden spoon as it cooks until browned add spices.\n2. Stir in beans, to mato paste, tomatoes, corn, and carrot and beef stock\n3. Bring to a simmer then reduce heat to low stirring occasionally for 9 -12\nminutes until thickened.\n4. Put corn chips in a bowl and spoon mince over the top, sprinkle with cheese\nand put under grill until  till cheese is melted\n5. Top with sour cream",
+    "serving_size": 4,
+    "equipment": [],
+    "photo": null
+  },
+  {
+    "id": 11,
+    "name": "Cauliflower Chee se",
+    "ingredients": [
+      {
+        "quantity": "1.0",
+        "unit": "head",
+        "ingredient": "of cauliflower OR 1 head of broccoli OR a mix of both"
+      },
+      {
+        "quantity": "50.0",
+        "unit": "plain",
+        "ingredient": "flour"
+      },
+      {
+        "quantity": "500.0",
+        "unit": "milk",
+        "ingredient": "500ml milk"
+      },
+      {
+        "quantity": "50.0",
+        "unit": "butter",
+        "ingredient": "50g butter"
+      },
+      {
+        "quantity": "100.0",
+        "unit": "grated",
+        "ingredient": "cheese"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Black pepper"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "1-2 tblsp fresh breadcrumbs"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Don’t forget a container to take your cauliflower cheese home in"
+      }
+    ],
+    "instructions": "1. 2cm hot water into a pan\n2.  Bring to the boil, add the vegetables and cover with a lid\n3.  Cook for 5mins maximum then drain using a colander then place them in a\ndish\n4.  Put the butter into a pan and melt it\n5.  Add flour and stir to form a paste\n6.  Gradually add the milk – keep stirring until it thickens.\n7.  Remove from the heat and stir in most of the cheese. Season.\n8.  Pour over the veg.\n9. Sprinkle on breadcrumbs and the remaining cheese\n10. Grill under  a hot grill until golden brown.\nFeeling a dventurous?  You could….\nTry using different vegetables\nAdd herbs to the sauce",
+    "serving_size": 1,
+    "equipment": [],
+    "photo": null
+  },
+  {
+    "id": 12,
+    "name": "Beef and Carrot and Onion",
+    "ingredients": [
+      {
+        "quantity": "45.0",
+        "unit": "",
+        "ingredient": "45"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Week 9 : Time for a quick Dinner"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Beef Nachos (per"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "group of 4)"
+      },
+      {
+        "quantity": "100.0",
+        "unit": "beef",
+        "ingredient": "mince"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "Brown",
+        "ingredient": "onion diced"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "T",
+        "ingredient": "minced garlic"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "¼ can of chilli beans"
+      },
+      {
+        "quantity": "2.0",
+        "unit": "T",
+        "ingredient": "Tomato paste"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ can chopped tomatoes"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ cup frozen corn"
+      },
+      {
+        "quantity": "1.0",
+        "unit": "carrot",
+        "ingredient": "grated"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½  c beef stock ( 1 beef stock cube + ½ c water)"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ t smoked paprika"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ t dried oregano"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ t onion powder"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ t ground cumin"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ t ground coriander"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "To serve"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "½ c cheese"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Sour cream"
+      },
+      {
+        "quantity": "",
+        "unit": "",
+        "ingredient": "Corn chips"
+      }
+    ],
+    "instructions": "1. Heat a little oil in a large frying pan on high heat cook mince, garlic and onion\nbreaking up mince with a wooden spoon as it cooks until browned add spices.\n2. Stir in beans, to mato paste, tomatoes, corn, and carrot and beef stock\n3. Bring to a simmer then reduce heat to low stirring occasionally for 9 -12\nminutes until thickened.\n4. Put corn chips in a bowl and spoon mince over the top, sprinkle with cheese\nand put under grill until  till cheese is melted\n5. Top with sour cream",
+    "serving_size": 1,
+    "equipment": [],
+    "photo": null
+  }
+]

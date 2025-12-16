@@ -1,0 +1,43 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>Recipe PDF Uploader</title> 
+    </head> 
+    <body> 
+        <h1>Upload Recipe PDF</h1> 
+        <form id="uploadForm" enctype="multipart/form-data" method="POST" action="/upload"> 
+            <input type="file" id="pdfFile" name="pdfFile" accept="application/pdf" required /> 
+            <button type="submit">Upload</button> 
+        </form>
+
+        <script> 
+            document.getElementById('uploadForm').addEventListener('submit', function(event){
+                event.preventDefault();
+                const fileInput = document.getElementById('pdfFile');
+                if(fileInput.files.length === 0) {
+                    alert('Please select a PDF file to upload.');
+                    return;
+                }
+                const file = fileInput.files[0];
+                // Create FormData object to send file
+                const formData = new FormData();
+                formData.append('pdfFile', file);
+
+                // Send file to backend
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Upload successful! Parsed recipe data: ' + JSON.stringify(data));
+                })
+                .catch(error => {
+                    alert('Upload failed: ' + error.message);
+                });
+            });
+        </script>
+</body> 
+</html>

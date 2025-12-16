@@ -1,0 +1,45 @@
+<!DOCTYPE html> 
+<html> 
+  <head> <!-- teachers.html--> 
+  <title>Teachers</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    </head> 
+    <body> 
+      <nav>
+        <a href="/">Dashboard</a> |
+        <a href="/recipes">Recipes</a> |
+        <a href="/recbk">Recipe Book</a> |
+        <a href="/class_ingredients">Class Ingredients</a> |
+        <a href="/booking">Booking Calendar</a> |
+        <a href="/shoplist">Shopping List</a> |
+        <a href="/admin">Admin</a>
+      </nav>
+
+      <main>
+        <h1>Staff</h1>
+        {% if rows %}
+        <table>
+          <thead>
+            <tr>
+              {% for key in rows[0].keys() %}
+              <th>{{ key }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in rows %}
+            <tr>
+              {% for value in row.values() %}
+              <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No staff records found.</p>
+        {% endif %}
+      </main>
+
+  </body>
+  </html>

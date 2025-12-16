@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Book</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    .view-toggle {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .view-toggle button {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      background: #f5f5f5;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .view-toggle button:hover {
+      background: #e0e0e0;
+    }
+    .view-toggle button.active {
+      background: #0066cc;
+      color: white;
+      border-color: #0066cc;
+    }
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .recipe-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+    .recipe-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+    .recipe-card h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      color: #0066cc;
+    }
+    .recipe-card h3 a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .recipe-card h3 a:hover {
+      text-decoration: underline;
+    }
+    .recipe-meta {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .recipe-ingredients {
+      font-size: 13px;
+      color: #444;
+      max-height: 120px;
+      overflow: hidden;
+      position: relative;
+    }
+    .recipe-ingredients::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(transparent, white);
+    }
+    .recipe-table {
+      margin-top: 20px;
+    }
+    .recipe-table table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    .recipe-table th,
+    .recipe-table td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    .recipe-table th {
+      background: #f5f5f5;
+      font-weight: 600;
+    }
+    .recipe-table a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .recipe-table a:hover {
+      text-decoration: underline;
+    }
+    .diet-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      margin: 2px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .search-bar {
+      max-width: 600px;
+      margin: 20px 0;
+    }
+    .search-bar input[type="search"] {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .search-bar button {
+      margin-left: 8px;
+    }
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .favorite-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #ccc;
+      transition: all 0.2s;
+      z-index: 10;
+      padding: 5px;
+      line-height: 1;
+    }
+    .favorite-btn:hover {
+      color: #ffd700;
+      transform: scale(1.2);
+    }
+    .favorite-btn.favorited {
+      color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="/" class="nav-brand">🍳 Food Room</a> |
+      <a href="/recbk">Recipe Book</a>
+      {% if current_user.is_authenticated %}
+        | <a href="/recipes">Recipes</a>
+        | <a href="/class_ingredients">Class Ingredients</a>
+        | <a href="/booking">Booking Calendar</a>
+        | <a href="/shoplist">Shopping List</a>
+        {% if current_user.is_admin() %}
+          | <a href="/admin">Admin</a>
+        {% endif %}
+      {% endif %}
+    </div>
+    <div class="nav-right">
+      {% if current_user.is_authenticated %}
+        <span class="user-info">{{ current_user.name }}<span class="badge badge-{{ current_user.role }}">{{ current_user.role }}</span></span> | <a href="/logout" class="logout-link">Logout</a>
+      {% else %}
+        <a href="/login" class="login-link">Login</a>
+      {% endif %}
+    </div>
+  </nav>
+  
+  <h1>Recipe Book</h1>
+  
+  <div class="view-toggle">
+    <span style="font-weight: 600; color: #666;">View:</span>
+    <button id="gridViewBtn" class="active" onclick="switchView('grid')">📱 Grid</button>
+    <button id="tableViewBtn" onclick="switchView('table')">📋 Table</button>
+  </div>
+
+  <form class="search-bar" method="get" action="/recbk">
+    <input type="search" name="q" placeholder="Search recipes by name or ingredient..." value="{{ q }}" />
+    <button type="submit">Search</button>
+    {% if q %}<a href="/recbk" style="margin-left:8px;">Clear</a>{% endif %}
+  </form>
+
+  {% if q %}
+    <p style="color:#666;font-size:14px;">Found {{ rows|length }} recipe(s) matching "{{ q }}"</p>
+  {% else %}
+    <p style="color:#666;font-size:14px;">Showing all {{ rows|length }} recipe(s)</p>
+  {% endif %}
+
+  {% if rows %}
+  <!-- GRID VIEW (DEFAULT) -->
+  <div id="gridView" class="recipe-grid">
+    {% for r in rows %}
+      <div class="recipe-card" style="position: relative;">
+        {% if current_user.is_authenticated %}
+        <button class="favorite-btn {% if r.id in favorites %}favorited{% endif %}" 
+                data-recipe-id="{{ r.id }}" 
+                onclick="event.stopPropagation(); toggleFavorite({{ r.id }}, this);"
+                title="{% if r.id in favorites %}Remove from favorites{% else %}Add to favorites{% endif %}">
+          {% if r.id in favorites %}★{% else %}☆{% endif %}
+        </button>
+        {% endif %}
+        <div onclick="window.location.href='/recipe/{{ r.id }}'">
+          <h3><a href="/recipe/{{ r.id }}">{{ r.name }}</a></h3>
+          
+          <div class="recipe-meta">
+            {% if r.serving_size %}
+              <strong>Serves:</strong> {{ r.serving_size }}
+            {% endif %}
+            {% if r.ingredients %}
+              | <strong>{{ r.ingredients|length }}</strong> ingredients
+            {% endif %}
+          </div>
+          
+          {% if r.ingredients %}
+          <div class="recipe-ingredients">
+            <strong>Ingredients:</strong>
+            <ul style="margin:4px 0;padding-left:20px;">
+              {% for ing in r.ingredients[:5] %}
+                <li>
+                  {% if ing.quantity or ing.unit %}
+                    {{ ing.quantity }} {{ ing.unit }}
+                  {% endif %}
+                  {{ ing.ingredient }}
+                </li>
+              {% endfor %}
+              {% if r.ingredients|length > 5 %}
+                <li style="color:#999;">+ {{ r.ingredients|length - 5 }} more...</li>
+              {% endif %}
+            </ul>
+          </div>
+        {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  
+  <!-- TABLE VIEW -->
+  <div id="tableView" class="recipe-table hidden">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Tags</th>
+          <th>Cuisine</th>
+          <th>Difficulty</th>
+          <th>Serves</th>
+          <th>Ingredients</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td><a href="/recipe/{{ r.id }}">{{ r.name }}</a></td>
+          <td>
+            {% if r.dietary_tags_list %}
+              {% for tag in r.dietary_tags_list %}
+                <span class="diet-tag">{{ tag }}</span>
+              {% endfor %}
+            {% else %}
+              <span style="color:#999;">—</span>
+            {% endif %}
+          </td>
+          <td>{{ r.cuisine or '—' }}</td>
+          <td>
+            {% if r.difficulty == 'Easy' %}
+              <span style="color:#28a745;">● Easy</span>
+            {% elif r.difficulty == 'Medium' %}
+              <span style="color:#ffc107;">● Medium</span>
+            {% elif r.difficulty == 'Hard' %}
+              <span style="color:#dc3545;">● Hard</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>{{ r.serving_size or '—' }}</td>
+          <td>
+            {% if r.ingredients %}
+              {{ r.ingredients|length }} items
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  {% else %}
+    <div class="no-results">
+      <p style="font-size:18px;">No recipes found.</p>
+      {% if q %}
+        <p>Try adjusting your search or <a href="/recbk">browse all recipes</a>.</p>
+      {% else %}
+        <p>Start by <a href="/">uploading some recipes</a>!</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+<script>
+// View switcher with localStorage persistence
+function switchView(view) {
+  const gridView = document.getElementById('gridView');
+  const tableView = document.getElementById('tableView');
+  const gridBtn = document.getElementById('gridViewBtn');
+  const tableBtn = document.getElementById('tableViewBtn');
+  
+  if (view === 'grid') {
+    gridView.classList.remove('hidden');
+    tableView.classList.add('hidden');
+    gridBtn.classList.add('active');
+    tableBtn.classList.remove('active');
+    localStorage.setItem('recipeView', 'grid');
+  } else {
+    gridView.classList.add('hidden');
+    tableView.classList.remove('hidden');
+    gridBtn.classList.remove('active');
+    tableBtn.classList.add('active');
+    localStorage.setItem('recipeView', 'table');
+  }
+}
+
+// Load saved view preference on page load (default to grid)
+window.addEventListener('DOMContentLoaded', function() {
+  const savedView = localStorage.getItem('recipeView') || 'grid';
+  switchView(savedView);
+});
+
+// Toggle favorite
+async function toggleFavorite(recipeId, button) {
+  const isFavorited = button.classList.contains('favorited');
+  const url = isFavorited ? `/recipe/unfavorite/${recipeId}` : `/recipe/favorite/${recipeId}`;
+  
+  try {
+    const response = await fetch(url, { method: 'POST' });
+    const data = await response.json();
+    
+    if (data.success) {
+      if (isFavorited) {
+        button.classList.remove('favorited');
+        button.textContent = '☆';
+        button.title = 'Add to favorites';
+      } else {
+        button.classList.add('favorited');
+        button.textContent = '★';
+        button.title = 'Remove from favorites';
+      }
+    } else {
+      alert('Error: ' + data.message);
+    }
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+    alert('Failed to update favorite');
+  }
+}
+</script>
+
+</body>
+</html>

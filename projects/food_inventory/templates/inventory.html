@@ -1,0 +1,27 @@
+<!DOCTYPE html> <html lang="en"> 
+  <head> <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Inventory</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    </head> 
+    <body> 
+      <nav>
+        <a href="/">Dashboard</a> |
+        <a href="/recipes">Recipes</a> |
+        <a href="/recbk">Recipe Book</a> |
+        <a href="/class_ingredients">Class Ingredients</a> |
+        <a href="/booking">Booking Calendar</a> |
+        <a href="/shoplist">Shopping List</a> |
+        <a href="/admin">Admin</a>
+      </nav>
+
+<h2>Pantry Inventory</h2>  
+<ul>     
+  {% for ing in ingredients %}         
+  <li>{{ ing.quantity }} {{ ing.unit }} {{ ing.ingredient }}</li>     
+  {% endfor %} 
+</ul>
+
+</body>
+
+</html>
