@@ -31,6 +31,7 @@ load_dotenv()
 if os.getenv('FLASK_ENV') == 'development':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
+
 app = Flask(__name__, template_folder="templates")
 
 # Database path
@@ -158,6 +159,12 @@ def init_db():
 def index():
     """Main page shows recipe book for everyone."""
     return render_template('recbk.html')  # Replace with your actual main template, e.g., 'index.html' or 'recipes.html'
+
+# Route for /recbk to allow direct access
+@app.route('/recbk')
+def recbk():
+    """Recipe book main page (Food Inventory System)."""
+    return render_template('recbk.html')
 
 
 # ============== Authentication Routes ==============
