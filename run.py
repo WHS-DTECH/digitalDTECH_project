@@ -4,6 +4,7 @@ from food_inventory.blueprint import food_inventory_bp
 import os
 print("CWD:", os.getcwd())
 print("TEMPLATE_DIR:", os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates'))
+
 TEMPLATE_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates')
 print(f"[DEBUG] TEMPLATE_DIR: {TEMPLATE_DIR}")
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
