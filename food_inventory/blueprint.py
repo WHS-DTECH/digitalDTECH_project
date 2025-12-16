@@ -33,7 +33,7 @@ from google_auth_oauthlib.flow import Flow
 import os
 
 # These should be imported from app.py or set here as needed
-from auth import User, get_staff_code_from_email
+from .auth import User, get_staff_code_from_email
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
