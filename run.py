@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="maintemplates")
 
 # Import and register blueprints for each project here in the future
 # from projects.food_inventory.app import food_inventory_bp
