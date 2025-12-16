@@ -27,7 +27,7 @@
                 </span>
                 <a href="/logout" class="logout-link">Logout</a>
             {% else %}
-                <a href="/login" class="login-link">Login</a>
+                <a href="{{ url_for('food_inventory.login') }}" class="login-link">Login</a>
             {% endif %}
         </div>
     </header>
