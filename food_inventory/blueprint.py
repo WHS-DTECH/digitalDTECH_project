@@ -1,3 +1,62 @@
+# Admin route (moved from app.py)
+import csv, io, sqlite3
+from .auth import require_role
+
+@food_inventory_bp.route('/admin', methods=['GET', 'POST'])
+@require_role('VP')
+def admin():
+    # Get recipe suggestions for display
+    suggestions = []
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), 'recipes.db')
+        with sqlite3.connect(db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            c.execute('''SELECT id, recipe_name, recipe_url, reason, suggested_by_name, \
+                        suggested_by_email, created_at, status \
+                        FROM recipe_suggestions \
+                        ORDER BY created_at DESC''')
+            suggestions = [dict(row) for row in c.fetchall()]
+    except sqlite3.OperationalError:
+        # Table doesn't exist yet
+        suggestions = []
+
+    preview_data = None
+    if request.method == 'POST':
+        # staff CSV upload
+        uploaded = request.files.get('staff_csv')
+        if not uploaded:
+            flash('No file uploaded')
+            return redirect(url_for('food_inventory.admin'))
+
+        # Read and normalize file content
+        file_content = uploaded.stream.read().decode('utf-8', errors='ignore')
+        # Normalize line endings
+        file_content = file_content.replace('\r\n', '\n').replace('\r', '\n')
+        stream = io.StringIO(file_content)
+        reader = csv.DictReader(stream)
+        rows = []
+        db_path = os.path.join(os.path.dirname(__file__), 'recipes.db')
+        with sqlite3.connect(db_path) as conn:
+            c = conn.cursor()
+            try:
+                for row in reader:
+                    code = row.get('Code') or row.get('code') or row.get('StaffCode') or row.get('staffcode')
+                    last = row.get('Last Name') or row.get('last_name') or row.get('Last') or row.get('last')
+                    first = row.get('First Name') or row.get('first_name') or row.get('First') or row.get('first')
+                    title = row.get('Title') or row.get('title')
+                    email = row.get('Email (School)') or row.get('email') or row.get('Email')
+                    if code and last and first:
+                        c.execute('INSERT OR IGNORE INTO teachers (code, last_name, first_name, title, email) VALUES (?, ?, ?, ?, ?)',
+                                  (code, last, first, title, email))
+                    rows.append(row)
+            except Exception as e:
+                flash(f'Error processing CSV: {str(e)}')
+                return redirect(url_for('food_inventory.admin'))
+        preview_data = rows
+        flash(f'Staff CSV processed: {len(rows)} rows')
+
+    return render_template('admin.html', preview_data=preview_data, suggestions=suggestions)
 
 from flask import Blueprint, render_template
 
