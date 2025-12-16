@@ -155,16 +155,8 @@ def init_db():
             UNIQUE(email, role)
         )''')
 
-@app.route('/')
-def index():
-    """Main page shows recipe book for everyone."""
-    return render_template('recbk.html')  # Replace with your actual main template, e.g., 'index.html' or 'recipes.html'
 
-# Route for /recbk to allow direct access
-@app.route('/recbk')
-def recbk():
-    """Recipe book main page (Food Inventory System)."""
-    return render_template('recbk.html')
+## All route functions should be moved to blueprint.py and use @food_inventory_bp.route instead of @app.route
 
 
 # ============== Authentication Routes ==============
